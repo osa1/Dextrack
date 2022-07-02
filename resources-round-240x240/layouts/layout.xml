@@ -1,0 +1,4 @@
+<layout id="WatchFace">
+    <drawable id="Time" class="TimeDrawable"></drawable>
+    <drawable id="BgData" class="BgDataDrawable"></drawable>
+</layout>
