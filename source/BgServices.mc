@@ -14,7 +14,7 @@ class BgDataService extends System.ServiceDelegate {
     function onTemporalEvent() {
         System.println("-- BgDataService.onTemporalEvent");
 
-        var work = Application.getApp().getValue(STORAGE_WORK);
+        var work = Storage.getValue(STORAGE_WORK);
 
         // TODO: We could avoid 5 min delay if we know how long a session id
         // will be valid for
@@ -51,7 +51,7 @@ class BgDataService extends System.ServiceDelegate {
         // else if (work.equals(WORK_READ_BGS)) {
         else {
             System.println("---- Requesting BGs");
-            var sessionId = Application.getApp().getValue(STORAGE_SESSION_ID);
+            var sessionId = Storage.getValue(STORAGE_SESSION_ID);
             Communications.makeWebRequest(
                 DEXCOM_BG_DATA_ENDPOINT,
                 {
