@@ -4,4 +4,11 @@
     <property id="ForegroundColor" type="number">0xFF0000</property>
     <property id="UseMilitaryFormat" type="boolean">false</property>
 
+    <property id="PROP_WORK" type="string">a</property>
+    <property id="BGS" type="array"></property>
+    <property id="SESSION_ID" type="string">a</property>
+    <property id="ERROR_MSG" type="string">a</property>
+    <property id="PROP_LAST_RESPONSE_TIME_SECS" type="number">123</property>
+    <property id="NEXT_EVENT_TIME_SECS" type="number">123</property>
+
 </properties>
