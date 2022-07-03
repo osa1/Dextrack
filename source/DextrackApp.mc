@@ -43,6 +43,11 @@ class DextrackApp extends Application.AppBase {
         return [new BgDataService()] as Lang.Array<Sys.ServiceDelegate>;
     }
 
+    // New app settings have been received so trigger a UI update
+    function onSettingsChanged() as Void {
+        WatchUi.requestUpdate();
+    }
+
     // Handle data passed from a ServiceDelegate to the application.
     //
     // When the Background process terminates, a data payload may be available.
