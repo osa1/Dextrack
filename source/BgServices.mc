@@ -14,7 +14,7 @@ class BgDataService extends System.ServiceDelegate {
     function onTemporalEvent() {
         System.println("-- BgDataService.onTemporalEvent");
 
-        var work = Application.getApp().getProperty(PROP_WORK);
+        var work = Application.getApp().getValue(STORAGE_WORK);
 
         // TODO: We could avoid 5 min delay if we know how long a session id
         // will be valid for
@@ -51,7 +51,7 @@ class BgDataService extends System.ServiceDelegate {
         // else if (work.equals(WORK_READ_BGS)) {
         else {
             System.println("---- Requesting BGs");
-            var sessionId = Application.getApp().getProperty(PROP_SESSION_ID);
+            var sessionId = Application.getApp().getValue(STORAGE_SESSION_ID);
             Communications.makeWebRequest(
                 DEXCOM_BG_DATA_ENDPOINT,
                 {
@@ -78,7 +78,7 @@ class BgDataService extends System.ServiceDelegate {
     (:background_method)
     function loginResponseCallback(responseCode, data) {
         // NB. All return paths in this function should call `Background.exit`
-        // and return `PROP_LAST_RESPONSE_TIME_SECS` as background data so that
+        // and return `STORAGE_LAST_RESPONSE_TIME_SECS` as background data so that
         // we will call `onBackgroundData` and schedule a new temporal event.
         var now = Time.now();
 
@@ -88,8 +88,8 @@ class BgDataService extends System.ServiceDelegate {
 
         if (responseCode != 200) {
             Background.exit({
-                PROP_ERROR_MSG => msgLoginError(responseCode),
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                STORAGE_ERROR_MSG => msgLoginError(responseCode),
+                STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
             });
             return;
         }
@@ -108,8 +108,8 @@ class BgDataService extends System.ServiceDelegate {
         if (dataLen == 36) {
             // UUID without double quotes
             Background.exit({
-                PROP_SESSION_ID => data,
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                STORAGE_SESSION_ID => data,
+                STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
             });
         }
 
@@ -117,15 +117,15 @@ class BgDataService extends System.ServiceDelegate {
             // UUID with double quotes
             var sessionId = data.substring(1, data.length() - 1);
             Background.exit({
-                PROP_SESSION_ID => sessionId,
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                STORAGE_SESSION_ID => sessionId,
+                STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
             });
         }
 
         else {
             Background.exit({
-                PROP_ERROR_MSG => msgLoginError("(UUID)"),
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                STORAGE_ERROR_MSG => msgLoginError("(UUID)"),
+                STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
             });
         }
     }
@@ -133,7 +133,7 @@ class BgDataService extends System.ServiceDelegate {
     (:background_method)
     function bgResponseCallback(responseCode, data) {
         // NB. All return paths in this function should call `Background.exit`
-        // and return `PROP_LAST_RESPONSE_TIME_SECS` as background data so that
+        // and return `STORAGE_LAST_RESPONSE_TIME_SECS` as background data so that
         // we will call `onBackgroundData` and schedule a new temporal event.
         var now = Time.now();
 
@@ -144,8 +144,8 @@ class BgDataService extends System.ServiceDelegate {
         if (responseCode == 500) {
             // Session invalid. Login again.
             Background.exit({
-                PROP_ERROR_MSG => MSG_INVALID_SESSION,
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                STORAGE_ERROR_MSG => MSG_INVALID_SESSION,
+                STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
             });
             return;
         }
@@ -153,8 +153,8 @@ class BgDataService extends System.ServiceDelegate {
         if (responseCode != 200) {
             // Some other error. Display the error and try to login again.
             Background.exit({
-                PROP_ERROR_MSG => msgOtherError(responseCode),
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                STORAGE_ERROR_MSG => msgOtherError(responseCode),
+                STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
             });
             return;
         }
@@ -208,8 +208,8 @@ class BgDataService extends System.ServiceDelegate {
         }
 
         Background.exit({
-            PROP_BGS => bgs,
-            PROP_LAST_RESPONSE_TIME_SECS => now.value()
+            STORAGE_BGS => bgs,
+            STORAGE_LAST_RESPONSE_TIME_SECS => now.value()
         });
     }
 }

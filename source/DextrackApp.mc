@@ -1,3 +1,4 @@
+using Toybox.Application.Storage;
 using Toybox.Application;
 using Toybox.Background;
 using Toybox.Lang;
@@ -12,10 +13,10 @@ class DextrackApp extends Application.AppBase {
         // Sys.println("-- DextrackApp.initialize");
         AppBase.initialize();
 
-        var work = getProperty(PROP_WORK);
+        var work = Storage.getValue(STORAGE_WORK);
         if (work == null) {
-            setProperty(PROP_WORK, WORK_LOGIN);
-            setProperty(PROP_ERROR_MSG, MSG_LOGGING_IN);
+            Storage.setValue(STORAGE_WORK, WORK_LOGIN);
+            Storage.setValue(STORAGE_ERROR_MSG, MSG_LOGGING_IN);
         }
     }
 
@@ -67,24 +68,24 @@ class DextrackApp extends Application.AppBase {
         // - SESSION_ID available => read bg data
         // - otherwise => login
 
-        if (data[PROP_ERROR_MSG] != null) {
-            setProperty(PROP_ERROR_MSG, data[PROP_ERROR_MSG]);
-            setProperty(PROP_SESSION_ID, null);
-            setProperty(PROP_WORK, WORK_LOGIN);
+        if (data[STORAGE_ERROR_MSG] != null) {
+            Storage.setValue(STORAGE_ERROR_MSG, data[STORAGE_ERROR_MSG]);
+            Storage.setValue(STORAGE_SESSION_ID, null);
+            Storage.setValue(STORAGE_WORK, WORK_LOGIN);
         }
 
-        else if (data[PROP_SESSION_ID] != null) {
-            setProperty(PROP_ERROR_MSG, MSG_REQUESTING_BG);
-            setProperty(PROP_SESSION_ID, data[PROP_SESSION_ID]);
-            setProperty(PROP_WORK, WORK_READ_BGS);
+        else if (data[STORAGE_SESSION_ID] != null) {
+            Storage.setValue(STORAGE_ERROR_MSG, MSG_REQUESTING_BG);
+            Storage.setValue(STORAGE_SESSION_ID, data[STORAGE_SESSION_ID]);
+            Storage.setValue(STORAGE_WORK, WORK_READ_BGS);
         }
 
-        else if (data[PROP_BGS] != null) {
-            setProperty(PROP_ERROR_MSG, null);
-            setProperty(PROP_BGS, data[PROP_BGS]);
+        else if (data[STORAGE_BGS] != null) {
+            Storage.setValue(STORAGE_ERROR_MSG, null);
+            Storage.setValue(STORAGE_BGS, data[STORAGE_BGS]);
         }
 
-        setProperty(PROP_LAST_RESPONSE_TIME_SECS, data[PROP_LAST_RESPONSE_TIME_SECS]);
+        Storage.setValue(STORAGE_LAST_RESPONSE_TIME_SECS, data[STORAGE_LAST_RESPONSE_TIME_SECS]);
 
         // Schedule the next temporal event. If the last bg data (N) was read
         // more than 2 minutes ago, then we wait `10 - N` minutes to request bg
@@ -108,16 +109,16 @@ class DextrackApp extends Application.AppBase {
 
         var now = Time.now();
 
-        if (data[PROP_BGS] == null) {
+        if (data[STORAGE_BGS] == null) {
 
             // Not reading BG data yet, schedule as soon as possible
             var nextEventTime = now.add(FIVE_MINUTES);
-            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
+            Storage.setValue(STORAGE_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
 
         } else {
 
-            var lastBgData = data[PROP_BGS][NUM_BGS - 1];
+            var lastBgData = data[STORAGE_BGS][NUM_BGS - 1];
             var lastBgDataUnixMillis = lastBgData["ts"];
             var lastBgDataUnixSecs = lastBgDataUnixMillis / 1000;
             var nowUnixSecs = now.value();
@@ -126,7 +127,7 @@ class DextrackApp extends Application.AppBase {
                 // Strange case, debug
                 System.println("BG data from future: nowUnixSecs=$1$, lastBgDataUnixSecs=$2$", [nowUnixSecs, lastBgDataUnixSecs]);
                 var nextEventTime = now.add(FIVE_MINUTES);
-                setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
+                Storage.setValue(STORAGE_NEXT_EVENT_TIME_SECS, nextEventTime.value());
                 Background.registerForTemporalEvent(nextEventTime);
                 return;
             }
@@ -148,7 +149,7 @@ class DextrackApp extends Application.AppBase {
 
             System.println(Lang.format("diff=$1$s nextEvent=$2$s", [diffSecs, nextEventTime.value() - nowUnixSecs]));
 
-            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
+            Storage.setValue(STORAGE_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
         }
     }

@@ -1,5 +1,5 @@
+using Toybox.Application.Storage;
 using Toybox.Application;
-
 using Toybox.Background;
 using Toybox.Lang;
 using Toybox.Math;
@@ -66,9 +66,9 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
-        var errMsg = app.getProperty(PROP_ERROR_MSG);
+        var errMsg = Storage.getValue(STORAGE_ERROR_MSG);
         if (errMsg != null) {
-            var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
+            var nextEventTimeSecs = Storage.getValue(STORAGE_NEXT_EVENT_TIME_SECS);
             var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
             var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
 
@@ -76,7 +76,7 @@ class BgDataDrawable extends WatchUi.Drawable {
             drawLine2_2(dc, Lang.format("[$1$m]", [nextEventTimeLeftMins]));
         }
 
-        var bgs = app.getProperty(PROP_BGS);
+        var bgs = Storage.getValue(STORAGE_BGS);
 
         if (bgs == null || bgs.size() == 0) {
             // TODO: Not sure when exactly this can happen, log it to debug later
@@ -96,7 +96,7 @@ class BgDataDrawable extends WatchUi.Drawable {
         var diffSecs = nowSecs - lastReadUnixSecs;
         var diffMins = diffSecs / 60;
 
-        var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
+        var nextEventTimeSecs = Storage.getValue(STORAGE_NEXT_EVENT_TIME_SECS);
         var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
         var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
 

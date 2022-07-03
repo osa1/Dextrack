@@ -1,3 +1,4 @@
+using Toybox.Application.Storage;
 using Toybox.Background;
 using Toybox.Graphics;
 using Toybox.Lang;
@@ -24,11 +25,11 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         if (lastTemporalEventTime != null) {
             // OK if this is in the past, event will be triggered immediately
             var nextTime = lastTemporalEventTime.add(FIVE_MINUTES);
-            Application.getApp().setProperty(PROP_NEXT_EVENT_TIME_SECS, nextTime.value());
+            Storage.setValue(STORAGE_NEXT_EVENT_TIME_SECS, nextTime.value());
             Background.registerForTemporalEvent(nextTime);
         } else {
             var now = Time.now();
-            Application.getApp().setProperty(PROP_NEXT_EVENT_TIME_SECS, now.value());
+            Storage.setValue(STORAGE_NEXT_EVENT_TIME_SECS, now.value());
             Background.registerForTemporalEvent(now);
         }
     }
