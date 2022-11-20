@@ -15,6 +15,9 @@ var timeDrawableHeight;
 const FIVE_MINUTES = new Time.Duration(5 * 60);
 
 class DextrackWatchFace extends WatchUi.WatchFace {
+    private var timeDrawable;
+    private var inLowPowerMode = false;
+
     function initialize() {
         Sys.println("-- DextrackWatchFace.initialize");
         WatchFace.initialize();
@@ -45,6 +48,8 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         timeDrawableHeight = largeFontHeight + smallFontHeight;
 
         setLayout(Rez.Layouts.WatchFace(dc));
+
+        timeDrawable = View.findDrawableById("Time");
     }
 
     // Called when this View is brought to the foreground. Restore the state of
@@ -66,6 +71,14 @@ class DextrackWatchFace extends WatchUi.WatchFace {
 
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
+        timeDrawable.onPartialUpdate(dc);
+    }
+
+    function onPartialUpdate(dc as Dc) as Void {
+        // Sys.println("-- DextractWatchFace.onPartialUpdate");
+        if (inLowPowerMode) {
+            timeDrawable.onPartialUpdate(dc);
+        }
     }
 
     // Called when this View is removed from the screen. Save the state of this
@@ -74,14 +87,16 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         // Sys.println("-- DextrackWatchFace.onHide");
     }
 
+    // Terminate any active timers and prepare for slow updates.
+    function onEnterSleep() as Void {
+        // Sys.println("-- DextrackWatchFace.onEnterSleep");
+        inLowPowerMode = true;
+    }
+
     // The user has just looked at their watch. Timers and animations may be
     // started here.
     function onExitSleep() as Void {
         // Sys.println("-- DextrackWatchFace.onExitSleep");
-    }
-
-    // Terminate any active timers and prepare for slow updates.
-    function onEnterSleep() as Void {
-        // Sys.println("-- DextrackWatchFace.onEnterSleep");
+        inLowPowerMode = false;
     }
 }

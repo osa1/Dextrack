@@ -155,7 +155,13 @@ class TimeDrawable extends WatchUi.Drawable {
 
         // Center the battery icon in the space right of HHMM
         var batteryIconMaxWidth = halfScreenWidth - (timeWidth / 2);
-        var batteryX = halfScreenWidth + (timeWidth / 2) + ((batteryIconMaxWidth - batteryIconWidth) / 2);
+
+        // Battery on right:
+        // var batteryX = halfScreenWidth + (timeWidth / 2) + ((batteryIconMaxWidth - batteryIconWidth) / 2);
+
+        // Battery on left:
+        var batteryX = (batteryIconMaxWidth - batteryIconWidth) / 2;
+
         var batteryY = halfScreenWidth - 10;
 
         var batteryColor;
@@ -208,6 +214,67 @@ class TimeDrawable extends WatchUi.Drawable {
             batteryY + smallFontHeight - 4,
             smallFont,
             batteryLevelStr,
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+    }
+
+    function onPartialUpdate(dc) {
+        // System.println("-- TimeDrawable.onPartialUpdate");
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Clear clip area
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Clip area doesn't depend on dynamic parameters (size of rendered
+        // "HHMM" etc.) to avoid glitches.
+        var screenWidth = dc.getWidth();
+        var screenHeight = screenWidth;
+        var halfScreenWidth = screenWidth / 2;
+
+        // Same as timeY
+        var clipStartY = halfScreenWidth - (largeFontHeight / 2);
+        var clipEndY = clipStartY + largeFontHeight;
+        var clipHeight = clipEndY - clipStartY;
+
+        var clipStartX = ((screenWidth - GRAPH_WIDTH) / 2) + GRAPH_WIDTH;
+        var clipEndX = screenWidth;
+        var clipWidth = clipEndX - clipStartX;
+
+        dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
+        dc.clearClip();
+
+        // Fill the clip, for debugging
+        // dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
+        // dc.fillRectangle(clipStartX, clipStartY, clipWidth, clipHeight);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Render second
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        var sec = System.getClockTime().sec;
+        var secStr = sec.format("%02d");
+        var secStrWidth = dc.getTextWidthInPixels(secStr, smallFont);
+
+        var rectangleStartX = clipStartX + 2;
+        var rectangleWidth = 30;
+        var rectangleStartY = clipStartY + ((largeFontHeight - smallFontHeight) - 4 - 15);
+        var rectangleHeight = smallFontHeight + 4;
+
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_YELLOW);
+        dc.fillRoundedRectangle(
+            rectangleStartX,
+            rectangleStartY,
+            rectangleWidth,
+            rectangleHeight,
+            2
+        );
+
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(
+            rectangleStartX + ((rectangleWidth - secStrWidth) / 2),
+            rectangleStartY + 2,
+            smallFont,
+            secStr,
             Graphics.TEXT_JUSTIFY_LEFT
         );
     }
