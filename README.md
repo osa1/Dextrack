@@ -121,7 +121,7 @@ a Dexcom app and reverse engineer the Dexcom share API][2].
 ## Related software
 
 - [xDrip][3]
-- [Dex CMG app][4] (not open source) is what I used on my watch before writing
+- [Dex CGM app][4] (not open source) is what I used on my watch before writing
   Dextrack.
 
 [3]: https://github.com/NightscoutFoundation/xDrip
