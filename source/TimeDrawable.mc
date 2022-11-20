@@ -6,6 +6,7 @@ using Toybox.WatchUi;
 
 class TimeDrawable extends WatchUi.Drawable {
     private var m_weekResourceArray, m_monthResourceArray;
+    private var hhmmWidth;
 
     function initialize(params) {
         // System.println("-- TimeDrawable.initialize");
@@ -54,6 +55,7 @@ class TimeDrawable extends WatchUi.Drawable {
         var hrWidth = dc.getTextWidthInPixels(hrStr, largeFont);
         var mnWidth = dc.getTextWidthInPixels(minStr, largeFont);
         var timeWidth = hrWidth + mnWidth;
+        hhmmWidth = timeWidth;
 
         var timeX = halfScreenWidth - (timeWidth / 2);
         var timeY = halfScreenWidth - (largeFontHeight / 2);
@@ -225,20 +227,18 @@ class TimeDrawable extends WatchUi.Drawable {
         // Clear clip area
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        // Clip area doesn't depend on dynamic parameters (size of rendered
-        // "HHMM" etc.) to avoid glitches.
         var screenWidth = dc.getWidth();
         var screenHeight = screenWidth;
         var halfScreenWidth = screenWidth / 2;
+        var halfScreenHeight = screenHeight / 2;
 
-        // Same as timeY
-        var clipStartY = halfScreenWidth - (largeFontHeight / 2);
-        var clipEndY = clipStartY + largeFontHeight;
-        var clipHeight = clipEndY - clipStartY;
+        var clipStartY = halfScreenHeight + (largeFontHeight / 2) - smallFontHeight - 13;
+        var clipHeight = smallFontHeight;
+        var clipEndY = clipStartY + clipHeight;
 
-        var clipStartX = ((screenWidth - GRAPH_WIDTH) / 2) + GRAPH_WIDTH;
-        var clipEndX = screenWidth;
-        var clipWidth = clipEndX - clipStartX;
+        var clipStartX = halfScreenWidth + (hhmmWidth / 2);
+        var clipWidth = 20; // enough for "ss" in small font
+        var clipEndX = clipStartX + clipWidth;
 
         dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
         dc.clearClip();
@@ -253,29 +253,8 @@ class TimeDrawable extends WatchUi.Drawable {
 
         var sec = System.getClockTime().sec;
         var secStr = sec.format("%02d");
-        var secStrWidth = dc.getTextWidthInPixels(secStr, smallFont);
 
-        var rectangleStartX = clipStartX + 2;
-        var rectangleWidth = 30;
-        var rectangleStartY = clipStartY + ((largeFontHeight - smallFontHeight) - 4 - 15);
-        var rectangleHeight = smallFontHeight + 4;
-
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_YELLOW);
-        dc.fillRoundedRectangle(
-            rectangleStartX,
-            rectangleStartY,
-            rectangleWidth,
-            rectangleHeight,
-            2
-        );
-
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            rectangleStartX + ((rectangleWidth - secStrWidth) / 2),
-            rectangleStartY + 2,
-            smallFont,
-            secStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        dc.drawText(clipStartX, clipStartY, smallFont, secStr, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }
