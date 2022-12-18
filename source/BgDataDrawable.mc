@@ -283,8 +283,10 @@ class BgDataDrawable extends WatchUi.Drawable {
         // System.println(Lang.format("  clipStartX = $1$, clipStartY = $2$, clipWidth = $3$, clipHeight = $4$", [clipStartX, clipStartY, clipWidth, clipHeight]));
 
         dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
-        dc.clearClip();
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
 
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(nextEventTimeTextX, nextEventTimeTextY, smallFont, nextEventTimeText, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }

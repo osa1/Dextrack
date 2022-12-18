@@ -43,6 +43,7 @@ class TimeDrawable extends WatchUi.Drawable {
         // System.println("-- TimeDrawable.draw");
 
         dc.clearClip();
+        dc.clear();
 
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
 
@@ -241,7 +242,8 @@ class TimeDrawable extends WatchUi.Drawable {
         var clipEndX = clipStartX + clipWidth;
 
         dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
-        dc.clearClip();
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
 
         // Fill the clip, for debugging
         // dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
