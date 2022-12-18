@@ -26,6 +26,12 @@ function widthAtY(screenWidth, y) {
 
 
 class BgDataDrawable extends WatchUi.Drawable {
+    // Position of the next event time text. Partial update handler uses this
+    // position to render the time until next event. Updated by `draw`.
+    private var nextEventTimeTextWidth;
+    private var nextEventTimeTextX;
+    private var nextEventTimeTextY;
+
     function initialize(params) {
        // System.println("-- BgDataDrawable.initialize");
 
@@ -80,7 +86,7 @@ class BgDataDrawable extends WatchUi.Drawable {
         var errMsg = app.getProperty(PROP_ERROR_MSG);
         if (errMsg != null) {
             drawLine1_2(dc, errMsg);
-            drawLine2_2(dc, Lang.format("[$1$]", [nextEventTimeText]));
+            drawLine2_2_nextEventTime(dc, nextEventTimeText);
         }
 
         var bgs = app.getProperty(PROP_BGS);
@@ -123,9 +129,9 @@ class BgDataDrawable extends WatchUi.Drawable {
                 }
 
                 // Show time until next request
-                var nextEventTimeTextWidth = dc.getTextWidthInPixels(nextEventTimeText, smallFont);
-                var nextEventTimeTextX = textX - nextEventTimeTextWidth - 10;
-                var nextEventTimeTextY = textY + largeFontHeight - smallFontHeight - 12;
+                nextEventTimeTextWidth = dc.getTextWidthInPixels(nextEventTimeText, smallFont);
+                nextEventTimeTextX = textX - nextEventTimeTextWidth - 10;
+                nextEventTimeTextY = textY + largeFontHeight - smallFontHeight - 12;
                 dc.drawText(nextEventTimeTextX, nextEventTimeTextY, smallFont, nextEventTimeText, Graphics.TEXT_JUSTIFY_LEFT);
 
                 // Show bg change rate
@@ -160,7 +166,7 @@ class BgDataDrawable extends WatchUi.Drawable {
                 }
             } else {
                 drawLine1_2(dc, "REQ. RECENT DATA");
-                drawLine2_2(dc, Lang.format("[$1$]", [nextEventTimeText]));
+                drawLine2_2_nextEventTime(dc, nextEventTimeText);
             }
         }
 
@@ -233,17 +239,52 @@ class BgDataDrawable extends WatchUi.Drawable {
         dc.drawText(textX, textY, smallFont, text, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
-    function drawLine2_2(dc, text) {
+    function drawLine2_2_nextEventTime(dc, text) {
         var screenHeight = dc.getHeight();
         var screenWidth = dc.getWidth();
 
-        var textWidth = dc.getTextWidthInPixels(text, smallFont);
-        var textX = (screenWidth - textWidth) / 2;
-        var textY = ((screenHeight - timeDrawableHeight) / 2) - 10;
-        dc.drawText(textX, textY, smallFont, text, Graphics.TEXT_JUSTIFY_LEFT);
+        nextEventTimeTextWidth = dc.getTextWidthInPixels(text, smallFont);
+        nextEventTimeTextX = (screenWidth - nextEventTimeTextWidth) / 2;
+        nextEventTimeTextY = ((screenHeight - timeDrawableHeight) / 2) - 10;
+        dc.drawText(nextEventTimeTextX, nextEventTimeTextY, smallFont, text, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
     function onPartialUpdate(dc) {
         // System.println("-- BgDataDrawable.onPartialUpdate");
+
+        var app = Application.getApp();
+        var nowSecs = Time.now().value();
+
+        var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
+        var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
+
+        if (nextEventTimeLeftSecs > 60) {
+            return;
+        }
+
+        var nextEventTimeText = Lang.format("$1$s", [nextEventTimeLeftSecs]);
+        var newNextEventTimeTextWidth = dc.getTextWidthInPixels(nextEventTimeText, smallFont);
+
+        var clipStartX;
+        var clipWidth;
+        if (newNextEventTimeTextWidth > nextEventTimeTextWidth) {
+            clipStartX = nextEventTimeTextX - newNextEventTimeTextWidth / 2;
+            clipWidth = newNextEventTimeTextWidth;
+        } else {
+            clipStartX = nextEventTimeTextX - nextEventTimeTextWidth / 2;
+            clipWidth = nextEventTimeTextWidth;
+        }
+
+        nextEventTimeTextWidth = newNextEventTimeTextWidth;
+
+        var clipStartY = nextEventTimeTextY;
+        var clipHeight = smallFontHeight;
+
+        // System.println(Lang.format("  clipStartX = $1$, clipStartY = $2$, clipWidth = $3$, clipHeight = $4$", [clipStartX, clipStartY, clipWidth, clipHeight]));
+
+        dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
+        dc.clearClip();
+
+        dc.drawText(nextEventTimeTextX, nextEventTimeTextY, smallFont, nextEventTimeText, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }
