@@ -128,18 +128,22 @@ class DextrackApp extends Application.AppBase {
             }
 
             var diffSecs = (nowUnixSecs - lastBgDataUnixSecs) % 300;
-
             var nextEventTime;
-            if (diffSecs < 15) {
-                // Give Dexcom some time to upload the next reading before
-                // requesting again
-                nextEventTime = now.add(FIVE_MINUTES).add(new Time.Duration(15 - diffSecs));
-            } else if (diffSecs >= 120) {
-                // Data more than a minute old. Wait 5-N minutes plus a few
+            var lastBgDataTime = new Time.Moment(lastBgDataUnixSecs);
+
+            if (diffSecs >= 120) {
+                // Data more than two minutes old. Wait 5-N minutes plus a few
                 // seconds to catch recent readings again.
-                nextEventTime = now.add(FIVE_MINUTES).add(new Time.Duration(300 - diffSecs + 15));
+                nextEventTime = lastBgDataTime.add(new Time.Duration(300 + 300 - diffSecs + 10));
             } else {
-                nextEventTime = now.add(FIVE_MINUTES);
+                // Data recent enough
+                nextEventTime = lastBgDataTime.add(new Time.Duration(300 + 10));
+            }
+
+            var lastTemporalEventTime = Background.getLastTemporalEventTime();
+            var minNextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
+            if (nextEventTime.lessThan(minNextEventTime)) {
+                nextEventTime = minNextEventTime;
             }
 
             System.println(Lang.format("diff=$1$s nextEvent=$2$s", [diffSecs, nextEventTime.value() - nowUnixSecs]));
