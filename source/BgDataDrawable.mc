@@ -66,14 +66,21 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
+        var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
+        var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
+        var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
+
+        var nextEventTimeText;
+        if (nextEventTimeLeftSecs < 60) {
+            nextEventTimeText = Lang.format("$1$s", [nextEventTimeLeftSecs]);
+        } else {
+            nextEventTimeText = Lang.format("$1$m", [nextEventTimeLeftSecs / 60]);
+        }
+
         var errMsg = app.getProperty(PROP_ERROR_MSG);
         if (errMsg != null) {
-            var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
-            var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
-            var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
-
             drawLine1_2(dc, errMsg);
-            drawLine2_2(dc, Lang.format("[$1$m]", [nextEventTimeLeftMins]));
+            drawLine2_2(dc, Lang.format("[$1$]", [nextEventTimeText]));
         }
 
         var bgs = app.getProperty(PROP_BGS);
@@ -96,10 +103,6 @@ class BgDataDrawable extends WatchUi.Drawable {
         var diffSecs = nowSecs - lastReadUnixSecs;
         var diffMins = diffSecs / 60;
 
-        var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
-        var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
-        var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
-
         if (errMsg == null) {
             // Show the current BG, but only if it's recent enough. Currently
             // we consider less than 10 minutes old as recent.
@@ -120,7 +123,6 @@ class BgDataDrawable extends WatchUi.Drawable {
                 }
 
                 // Show time until next request
-                var nextEventTimeText = Lang.format("$1$m", [nextEventTimeLeftMins]);
                 var nextEventTimeTextWidth = dc.getTextWidthInPixels(nextEventTimeText, smallFont);
                 var nextEventTimeTextX = textX - nextEventTimeTextWidth - 10;
                 var nextEventTimeTextY = textY + largeFontHeight - smallFontHeight - 12;
@@ -158,7 +160,7 @@ class BgDataDrawable extends WatchUi.Drawable {
                 }
             } else {
                 drawLine1_2(dc, "REQ. RECENT DATA");
-                drawLine2_2(dc, Lang.format("[$1$m]", [nextEventTimeLeftMins]));
+                drawLine2_2(dc, Lang.format("[$1$]", [nextEventTimeText]));
             }
         }
 
@@ -239,5 +241,9 @@ class BgDataDrawable extends WatchUi.Drawable {
         var textX = (screenWidth - textWidth) / 2;
         var textY = ((screenHeight - timeDrawableHeight) / 2) - 10;
         dc.drawText(textX, textY, smallFont, text, Graphics.TEXT_JUSTIFY_LEFT);
+    }
+
+    function onPartialUpdate(dc) {
+        // System.println("-- BgDataDrawable.onPartialUpdate");
     }
 }

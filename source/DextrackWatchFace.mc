@@ -16,6 +16,7 @@ const FIVE_MINUTES = new Time.Duration(5 * 60);
 
 class DextrackWatchFace extends WatchUi.WatchFace {
     private var timeDrawable;
+    private var bgDataDrawable;
     private var inLowPowerMode = false;
 
     function initialize() {
@@ -50,6 +51,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         setLayout(Rez.Layouts.WatchFace(dc));
 
         timeDrawable = View.findDrawableById("Time");
+        bgDataDrawable = View.findDrawableById("BgData");
     }
 
     // Called when this View is brought to the foreground. Restore the state of
@@ -72,12 +74,14 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
         timeDrawable.onPartialUpdate(dc);
+        bgDataDrawable.onPartialUpdate(dc);
     }
 
     function onPartialUpdate(dc as Dc) as Void {
         // Sys.println("-- DextractWatchFace.onPartialUpdate");
         if (inLowPowerMode) {
             timeDrawable.onPartialUpdate(dc);
+            bgDataDrawable.onPartialUpdate(dc);
         }
     }
 
