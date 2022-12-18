@@ -106,7 +106,8 @@ class DextrackApp extends Application.AppBase {
         if (data[PROP_BGS] == null) {
 
             // Not reading BG data yet, schedule as soon as possible
-            var nextEventTime = now.add(FIVE_MINUTES);
+            var lastTemporalEventTime = Background.getLastTemporalEventTime();
+            var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
             setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
 
