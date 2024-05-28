@@ -95,9 +95,9 @@ const DEX_ACCOUNT_ID = "<your Dexcom account id>";
 const DEX_PASSWORD = "<your Dexcom password>";
 ```
 
-Now you can compile the project as usual (see [Garmin's tutorial][1]), and copy
-the generated file (the one with extension `.prg`) to your watch (e.g. to
-`Primary/GARMIN/APPS` in Forerunner 245).
+Now you can compile the project as usual (see [Garmin's tutorial][1]), **using
+SDK version 4.0.1**, and copy the generated file (the one with extension
+`.prg`) to your watch (e.g. to `Primary/GARMIN/APPS` in Forerunner 245).
 
 **If you are in the US**, update "shareous1" in `get_account_id.py` and
 `source/Consts.mc` files to "share2".
