@@ -2,6 +2,7 @@ using Toybox.Application;
 using Toybox.Background;
 using Toybox.Lang;
 using Toybox.System as Sys;
+using Toybox.Time.Gregorian;
 using Toybox.Time;
 using Toybox.WatchUi;
 
@@ -12,8 +13,17 @@ class DextrackApp extends Application.AppBase {
         // Sys.println("-- DextrackApp.initialize");
         AppBase.initialize();
 
+        // Initialize work. Avoid trying fetching BG data with old session ID.
+        // This happens when the watch is turned off for a while and then
+        // turned on.
         var work = getProperty(PROP_WORK);
-        if (work == null) {
+        var lastResponseTimeSecs = getProperty(PROP_LAST_RESPONSE_TIME_SECS);
+        var now = Time.now().value();
+
+        // var msg = Lang.format("Last response time = $1$, now = $2$", [lastResponseTimeSecs, now]);
+        // Sys.println(msg);
+
+        if (work == null || now - lastResponseTimeSecs >= Gregorian.SECONDS_PER_HOUR) {
             setProperty(PROP_WORK, WORK_LOGIN);
             setProperty(PROP_ERROR_MSG, MSG_LOGGING_IN);
         }
