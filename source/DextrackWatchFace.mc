@@ -23,10 +23,10 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         Sys.println("-- DextrackWatchFace.initialize");
         WatchFace.initialize();
 
-        // Start temporal events
+        // Start temporal events.
         var lastTemporalEventTime = Background.getLastTemporalEventTime();
         if (lastTemporalEventTime != null) {
-            // OK if this is in the past, event will be triggered immediately
+            // OK if this is in the past, event will be triggered immediately.
             var nextTime = lastTemporalEventTime.add(FIVE_MINUTES);
             Application.getApp().setProperty(PROP_NEXT_EVENT_TIME_SECS, nextTime.value());
             Background.registerForTemporalEvent(nextTime);
@@ -37,7 +37,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         }
     }
 
-    // Load your resources here
+    // Load resources here.
     function onLayout(dc as Graphics.Dc) as Void {
         // Sys.println("-- DextrackWatchFace.onLayout");
 

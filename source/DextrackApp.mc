@@ -9,7 +9,7 @@ using Toybox.WatchUi;
 class DextrackApp extends Application.AppBase {
     // override
     function initialize() {
-        // Sys.println("-- DextrackApp.initialize");
+        Sys.println("-- DextrackApp.initialize");
         AppBase.initialize();
 
         var work = getProperty(PROP_WORK);
@@ -57,6 +57,17 @@ class DextrackApp extends Application.AppBase {
     function onBackgroundData(data) {
         Sys.println(Lang.format("-- DextrackApp.onBackgroundData data=$1$", [data]));
 
+        var now = Time.now();
+
+        {
+            // Register for a temporal event right away to avoid any
+            // bugs/crashes below stopping temporal events. In the common case
+            // (no bugs, weird data) we will override this temporal event below.
+            var nextEventTime = now.add(FIVE_MINUTES);
+            Background.registerForTemporalEvent(nextEventTime);
+            Sys.println("---- DextrackApp.onBackgroundData temporal event scheduled");
+        }
+
         // TODO: This can be simplified as:
         //
         // - SESSION_ID available => read bg data
@@ -79,8 +90,6 @@ class DextrackApp extends Application.AppBase {
             setProperty(PROP_BGS, data[PROP_BGS]);
         }
 
-        setProperty(PROP_LAST_RESPONSE_TIME_SECS, data[PROP_LAST_RESPONSE_TIME_SECS]);
-
         // Schedule the next temporal event. If the last bg data (N) was read
         // more than 2 minutes ago, then we wait `10 - N` minutes to request bg
         // data again to make read more recent data starting from the next
@@ -100,8 +109,6 @@ class DextrackApp extends Application.AppBase {
         //
         // TODO: This assumes that the Dexcom device (e.g. phone) and the watch
         // are on same time zone.
-
-        var now = Time.now();
 
         if (data[PROP_BGS] == null) {
 

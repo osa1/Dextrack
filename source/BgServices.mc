@@ -1,4 +1,4 @@
-// Implements temporal event handling (background services)
+// Implements temporal event handling (background services).
 
 using Toybox.Application;
 using Toybox.System;
@@ -16,8 +16,8 @@ class BgDataService extends System.ServiceDelegate {
 
         var work = Application.getApp().getProperty(PROP_WORK);
 
-        // TODO: We could avoid 5 min delay if we know how long a session id
-        // will be valid for
+        // TODO: We could avoid 5 min delay if we knew how long a session id
+        // will be valid for.
 
         if (work == null || work.equals(WORK_LOGIN)) {
             System.println("---- Getting session id");
@@ -77,9 +77,7 @@ class BgDataService extends System.ServiceDelegate {
 
     (:background_method)
     function loginResponseCallback(responseCode, data) {
-        // NB. All return paths in this function should call `Background.exit`
-        // and return `PROP_LAST_RESPONSE_TIME_SECS` as background data so that
-        // we will call `onBackgroundData` and schedule a new temporal event.
+        // NB. All return paths in this function should call `Background.exit`.
         var now = Time.now();
 
         System.println("-- BgDataService.loginResponseCallback");
@@ -88,8 +86,7 @@ class BgDataService extends System.ServiceDelegate {
 
         if (responseCode != 200) {
             Background.exit({
-                PROP_ERROR_MSG => msgLoginError(responseCode),
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                PROP_ERROR_MSG => msgLoginError(responseCode)
             });
             return;
         }
@@ -108,8 +105,7 @@ class BgDataService extends System.ServiceDelegate {
         if (dataLen == 36) {
             // UUID without double quotes
             Background.exit({
-                PROP_SESSION_ID => data,
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                PROP_SESSION_ID => data
             });
         }
 
@@ -117,24 +113,20 @@ class BgDataService extends System.ServiceDelegate {
             // UUID with double quotes
             var sessionId = data.substring(1, data.length() - 1);
             Background.exit({
-                PROP_SESSION_ID => sessionId,
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                PROP_SESSION_ID => sessionId
             });
         }
 
         else {
             Background.exit({
-                PROP_ERROR_MSG => msgLoginError("(UUID)"),
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                PROP_ERROR_MSG => msgLoginError("(UUID)")
             });
         }
     }
 
     (:background_method)
     function bgResponseCallback(responseCode, data) {
-        // NB. All return paths in this function should call `Background.exit`
-        // and return `PROP_LAST_RESPONSE_TIME_SECS` as background data so that
-        // we will call `onBackgroundData` and schedule a new temporal event.
+        // NB. All return paths in this function should call `Background.exit`.
         var now = Time.now();
 
         System.println("-- BgDataService.bgResponseCallback");
@@ -144,8 +136,7 @@ class BgDataService extends System.ServiceDelegate {
         if (responseCode == 500) {
             // Session invalid. Login again.
             Background.exit({
-                PROP_ERROR_MSG => MSG_INVALID_SESSION,
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                PROP_ERROR_MSG => MSG_INVALID_SESSION
             });
             return;
         }
@@ -153,8 +144,7 @@ class BgDataService extends System.ServiceDelegate {
         if (responseCode != 200) {
             // Some other error. Display the error and try to login again.
             Background.exit({
-                PROP_ERROR_MSG => msgOtherError(responseCode),
-                PROP_LAST_RESPONSE_TIME_SECS => now.value()
+                PROP_ERROR_MSG => msgOtherError(responseCode)
             });
             return;
         }
@@ -208,8 +198,7 @@ class BgDataService extends System.ServiceDelegate {
         }
 
         Background.exit({
-            PROP_BGS => bgs,
-            PROP_LAST_RESPONSE_TIME_SECS => now.value()
+            PROP_BGS => bgs
         });
     }
 }
