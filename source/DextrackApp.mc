@@ -64,6 +64,7 @@ class DextrackApp extends Application.AppBase {
             // bugs/crashes below stopping temporal events. In the common case
             // (no bugs, weird data) we will override this temporal event below.
             var nextEventTime = now.add(FIVE_MINUTES);
+            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
             Sys.println("---- DextrackApp.onBackgroundData temporal event scheduled");
         }
