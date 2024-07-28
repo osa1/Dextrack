@@ -17,6 +17,9 @@ class DextrackApp extends Application.AppBase {
             setProperty(PROP_WORK, WORK_LOGIN);
             setProperty(PROP_ERROR_MSG, MSG_LOGGING_IN);
         }
+
+        // Schedule the first temporal event.
+        scheduleTemporalEvent();
     }
 
     // onStart() is called on application start up
@@ -114,10 +117,7 @@ class DextrackApp extends Application.AppBase {
         if (data[PROP_BGS] == null) {
 
             // Not reading BG data yet, schedule as soon as possible
-            var lastTemporalEventTime = Background.getLastTemporalEventTime();
-            var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
-            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
-            Background.registerForTemporalEvent(nextEventTime);
+            scheduleTemporalEvent();
 
         } else {
 
@@ -155,5 +155,12 @@ class DextrackApp extends Application.AppBase {
             setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
         }
+    }
+
+    function scheduleTemporalEvent() {
+        var lastTemporalEventTime = Background.getLastTemporalEventTime();
+        var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
+        setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
+        Background.registerForTemporalEvent(nextEventTime);
     }
 }
