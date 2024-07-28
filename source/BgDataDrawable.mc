@@ -72,15 +72,20 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
-        var nextEventTimeSecs = Background.getTemporalEventRegisteredTime().value();
-        var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
-        var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
-
         var nextEventTimeText;
-        if (nextEventTimeLeftSecs < 60) {
-            nextEventTimeText = Lang.format("$1$s", [nextEventTimeLeftSecs]);
+        var nextTemporalEventTime = Background.getTemporalEventRegisteredTime();
+        if (nextTemporalEventTime == null) {
+            nextEventTimeText = "NA";
         } else {
-            nextEventTimeText = Lang.format("$1$m", [nextEventTimeLeftSecs / 60]);
+            var nextEventTimeSecs = nextTemporalEventTime.value();
+            var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
+            var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
+
+            if (nextEventTimeLeftSecs < 60) {
+                nextEventTimeText = Lang.format("$1$s", [nextEventTimeLeftSecs]);
+            } else {
+                nextEventTimeText = Lang.format("$1$m", [nextEventTimeLeftSecs / 60]);
+            }
         }
 
         var errMsg = app.getProperty(PROP_ERROR_MSG);
@@ -255,7 +260,13 @@ class BgDataDrawable extends WatchUi.Drawable {
         var app = Application.getApp();
         var nowSecs = Time.now().value();
 
-        var nextEventTimeSecs = Background.getTemporalEventRegisteredTime().value();
+
+        var nextTemporalEventTime = Background.getTemporalEventRegisteredTime();
+        if (nextTemporalEventTime == null) {
+            return;
+        }
+
+        var nextEventTimeSecs = nextTemporalEventTime.value();
         var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
 
         if (nextEventTimeLeftSecs > 60) {
