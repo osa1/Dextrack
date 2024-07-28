@@ -36,11 +36,14 @@ function msgLoginError(responseCode) {
 }
 
 function msgOtherError(responseCode) {
-    // Handle some common errors.
+    // Handle some common errors. Reference:
+    // https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html
     if (responseCode == -2) {
         return "BLE host timeout";
     } else if (responseCode == -104) {
         return "BLE unavailable";
+    } else if (responseCode == -300) {
+        return "Req timeout";
     } else {
         return Lang.format("ERROR $1$", [responseCode]);
     }

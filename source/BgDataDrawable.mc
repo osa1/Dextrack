@@ -260,7 +260,6 @@ class BgDataDrawable extends WatchUi.Drawable {
         var app = Application.getApp();
         var nowSecs = Time.now().value();
 
-
         var nextTemporalEventTime = Background.getTemporalEventRegisteredTime();
         if (nextTemporalEventTime == null) {
             return;

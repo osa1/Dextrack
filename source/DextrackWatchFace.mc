@@ -23,16 +23,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         Sys.println("-- DextrackWatchFace.initialize");
         WatchFace.initialize();
 
-        // Start temporal events.
-        var lastTemporalEventTime = Background.getLastTemporalEventTime();
-        if (lastTemporalEventTime != null) {
-            // OK if this is in the past, event will be triggered immediately.
-            var nextTime = lastTemporalEventTime.add(FIVE_MINUTES);
-            Background.registerForTemporalEvent(nextTime);
-        } else {
-            var now = Time.now();
-            Background.registerForTemporalEvent(now);
-        }
+        startTemporalEvent();
     }
 
     // Load resources here.
@@ -57,22 +48,20 @@ class DextrackWatchFace extends WatchUi.WatchFace {
     // into memory.
     function onShow() as Void {
         // Sys.println("-- DextrackWatchFace.onShow");
+
+        startTemporalEvent();
     }
 
     // Update the view
     function onUpdate(dc as Graphics.Dc) as Void {
         // Sys.println("-- DextrackWatchFace.onUpdate");
 
-        // Get and show the current time
-        // var clockTime = System.getClockTime();
-        // var timeString = Lang.format("$1$:$2$", [clockTime.hour, clockTime.min.format("%02d")]);
-        // var view = View.findDrawableById("TimeLabel") as Text;
-        // view.setText(timeString);
-
-        // Call the parent onUpdate function to redraw the layout
+        // Call the parent onUpdate function to redraw the layout.
         View.onUpdate(dc);
         timeDrawable.onPartialUpdate(dc);
         bgDataDrawable.onPartialUpdate(dc);
+
+        startTemporalEvent();
     }
 
     function onPartialUpdate(dc as Dc) as Void {
@@ -81,6 +70,8 @@ class DextrackWatchFace extends WatchUi.WatchFace {
             timeDrawable.onPartialUpdate(dc);
             bgDataDrawable.onPartialUpdate(dc);
         }
+
+        startTemporalEvent();
     }
 
     // Called when this View is removed from the screen. Save the state of this
@@ -100,5 +91,22 @@ class DextrackWatchFace extends WatchUi.WatchFace {
     function onExitSleep() as Void {
         // Sys.println("-- DextrackWatchFace.onExitSleep");
         inLowPowerMode = false;
+    }
+
+    function startTemporalEvent() {
+        var nextTemporalEventTime = Background.getTemporalEventRegisteredTime();
+        if (nextTemporalEventTime != null) {
+            return;
+        }
+
+        var lastTemporalEventTime = Background.getLastTemporalEventTime();
+        if (lastTemporalEventTime != null) {
+            // OK if this is in the past, event will be triggered immediately.
+            var nextTime = lastTemporalEventTime.add(FIVE_MINUTES);
+            Background.registerForTemporalEvent(nextTime);
+        } else {
+            var now = Time.now();
+            Background.registerForTemporalEvent(now);
+        }
     }
 }
