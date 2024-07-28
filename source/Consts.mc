@@ -25,9 +25,23 @@ const MSG_LOGGING_IN = "LOGGING IN";
 const MSG_INVALID_SESSION = "SESSION INVALID";
 
 function msgLoginError(responseCode) {
-    return Lang.format("LOGIN ERROR $1$", [responseCode]);
+    // Handle some common errors.
+    if (responseCode == -2) {
+        return "BLE host timeout";
+    } else if (responseCode == -104) {
+        return "BLE unavailable";
+    } else {
+        return Lang.format("LOGIN ERROR $1$", [responseCode]);
+    }
 }
 
 function msgOtherError(responseCode) {
-    return Lang.format("ERROR $1$", [responseCode]);
+    // Handle some common errors.
+    if (responseCode == -2) {
+        return "BLE host timeout";
+    } else if (responseCode == -104) {
+        return "BLE unavailable";
+    } else {
+        return Lang.format("ERROR $1$", [responseCode]);
+    }
 }
