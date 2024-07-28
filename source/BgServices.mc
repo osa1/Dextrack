@@ -1,6 +1,7 @@
 // Implements temporal event handling (background services).
 
 using Toybox.Application;
+using Toybox.Lang;
 using Toybox.System;
 
 (:background)
@@ -76,9 +77,8 @@ class BgDataService extends System.ServiceDelegate {
     }
 
     (:background_method)
-    function loginResponseCallback(responseCode, data) {
+    function loginResponseCallback(responseCode as Lang.Number, data as Lang.String) as Void {
         // NB. All return paths in this function should call `Background.exit`.
-        var now = Time.now();
 
         System.println("-- BgDataService.loginResponseCallback");
         var msg = Lang.format("Response code = $1$, data = $2$", [responseCode, data]);
@@ -125,9 +125,8 @@ class BgDataService extends System.ServiceDelegate {
     }
 
     (:background_method)
-    function bgResponseCallback(responseCode, data) {
+    function bgResponseCallback(responseCode as Lang.Number, data as Lang.Dictionary) as Void {
         // NB. All return paths in this function should call `Background.exit`.
-        var now = Time.now();
 
         System.println("-- BgDataService.bgResponseCallback");
         var msg = Lang.format("Response code = $1$, data = $2$", [responseCode, data]);

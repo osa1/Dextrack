@@ -64,7 +64,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         startTemporalEvent();
     }
 
-    function onPartialUpdate(dc as Dc) as Void {
+    function onPartialUpdate(dc as Graphics.Dc) as Void {
         // Sys.println("-- DextractWatchFace.onPartialUpdate");
         if (inLowPowerMode) {
             timeDrawable.onPartialUpdate(dc);

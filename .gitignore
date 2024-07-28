@@ -2,3 +2,6 @@ _compiled.prg
 _compiled.prg.debug.xml
 source/Secrets.mc
 bin/
+gen/
+internal-mir/
+mir/

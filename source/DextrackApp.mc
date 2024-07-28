@@ -2,6 +2,7 @@ using Toybox.Application;
 using Toybox.Background;
 using Toybox.Lang;
 using Toybox.System as Sys;
+using Toybox.System;
 using Toybox.Time;
 using Toybox.WatchUi;
 
@@ -28,15 +29,15 @@ class DextrackApp extends Application.AppBase {
     }
 
     // override
-    function getInitialView() as Lang.Array<WatchUi.Views or WatchUi.InputDelegates>? {
+    function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
         // Sys.println("-- DextrackApp.getInitialView");
-        return [new DextrackWatchFace()] as Lang.Array<WatchUi.Views or WatchUi.InputDelegates>;
+        return [new DextrackWatchFace()];
     }
 
     // override
-    function getServiceDelegate() {
+    function getServiceDelegate() as [System.ServiceDelegate] {
         // Sys.println("-- DextrackApp.getServiceDelegate");
-        return [new BgDataService()] as Lang.Array<Sys.ServiceDelegate>;
+        return [new BgDataService()];
     }
 
     // Handle data passed from a ServiceDelegate to the application.
@@ -50,7 +51,7 @@ class DextrackApp extends Application.AppBase {
     //
     // override
     (:background_method)
-    function onBackgroundData(data) {
+    function onBackgroundData(data as Application.PersistableType) {
         Sys.println(Lang.format("-- DextrackApp.onBackgroundData data=$1$", [data]));
 
         var now = Time.now();
@@ -69,21 +70,23 @@ class DextrackApp extends Application.AppBase {
         // - SESSION_ID available => read bg data
         // - otherwise => login
 
-        if (data[PROP_ERROR_MSG] != null) {
-            setProperty(PROP_ERROR_MSG, data[PROP_ERROR_MSG]);
+        var dataMap = data as Lang.Dictionary;
+
+        if (dataMap[PROP_ERROR_MSG] != null) {
+            setProperty(PROP_ERROR_MSG, dataMap[PROP_ERROR_MSG]);
             setProperty(PROP_SESSION_ID, null);
             setProperty(PROP_WORK, WORK_LOGIN);
         }
 
-        else if (data[PROP_SESSION_ID] != null) {
+        else if (dataMap[PROP_SESSION_ID] != null) {
             setProperty(PROP_ERROR_MSG, MSG_REQUESTING_BG);
-            setProperty(PROP_SESSION_ID, data[PROP_SESSION_ID]);
+            setProperty(PROP_SESSION_ID, dataMap[PROP_SESSION_ID]);
             setProperty(PROP_WORK, WORK_READ_BGS);
         }
 
-        else if (data[PROP_BGS] != null) {
+        else if (dataMap[PROP_BGS] != null) {
             setProperty(PROP_ERROR_MSG, null);
-            setProperty(PROP_BGS, data[PROP_BGS]);
+            setProperty(PROP_BGS, dataMap[PROP_BGS]);
         }
 
         // Schedule the next temporal event. If the last bg data (N) was read
@@ -106,7 +109,7 @@ class DextrackApp extends Application.AppBase {
         // TODO: This assumes that the Dexcom device (e.g. phone) and the watch
         // are on same time zone.
 
-        if (data[PROP_BGS] == null) {
+        if (dataMap[PROP_BGS] == null) {
 
             // Not reading BG data yet, schedule as soon as possible
             var lastTemporalEventTime = Background.getLastTemporalEventTime();
@@ -115,14 +118,14 @@ class DextrackApp extends Application.AppBase {
 
         } else {
 
-            var lastBgData = data[PROP_BGS][NUM_BGS - 1];
+            var lastBgData = dataMap[PROP_BGS][NUM_BGS - 1];
             var lastBgDataUnixMillis = lastBgData["ts"];
             var lastBgDataUnixSecs = lastBgDataUnixMillis / 1000;
             var nowUnixSecs = now.value();
 
             if (lastBgDataUnixSecs > nowUnixSecs) {
                 // Strange case, debug
-                System.println("BG data from future: nowUnixSecs=$1$, lastBgDataUnixSecs=$2$", [nowUnixSecs, lastBgDataUnixSecs]);
+                System.println(Lang.format("BG data from future: nowUnixSecs=$1$, lastBgDataUnixSecs=$2$", [nowUnixSecs, lastBgDataUnixSecs]));
                 var nextEventTime = now.add(FIVE_MINUTES);
                 Background.registerForTemporalEvent(nextEventTime);
                 return;

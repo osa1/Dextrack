@@ -151,7 +151,6 @@ class TimeDrawable extends WatchUi.Drawable {
 
         var batteryIconWidth = dc.getTextWidthInPixels("100%", smallFont);
         var batteryIconHeight = smallFontHeight - 4;
-        var batteryTotalHeight = batteryIconHeight + (2 * smallFontHeight) - 4;
 
         var batteryLevelFloat = System.getSystemStats().battery;
 	var batteryLevel = Math.floor(batteryLevelFloat).toLong();
@@ -235,11 +234,9 @@ class TimeDrawable extends WatchUi.Drawable {
 
         var clipStartY = halfScreenHeight + (largeFontHeight / 2) - smallFontHeight - 13;
         var clipHeight = smallFontHeight;
-        var clipEndY = clipStartY + clipHeight;
 
         var clipStartX = halfScreenWidth + (hhmmWidth / 2);
         var clipWidth = 20; // enough for "ss" in small font
-        var clipEndX = clipStartX + clipWidth;
 
         dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);

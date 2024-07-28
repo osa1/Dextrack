@@ -79,7 +79,6 @@ class BgDataDrawable extends WatchUi.Drawable {
         } else {
             var nextEventTimeSecs = nextTemporalEventTime.value();
             var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
-            var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
 
             if (nextEventTimeLeftSecs < 60) {
                 nextEventTimeText = Lang.format("$1$s", [nextEventTimeLeftSecs]);
@@ -94,7 +93,7 @@ class BgDataDrawable extends WatchUi.Drawable {
             drawLine2_2_nextEventTime(dc, nextEventTimeText);
         }
 
-        var bgs = app.getProperty(PROP_BGS);
+        var bgs = app.getProperty(PROP_BGS) as Lang.Array<Lang.Number>;
 
         if (bgs == null || bgs.size() == 0) {
             // TODO: Not sure when exactly this can happen, log it to debug later
@@ -184,12 +183,6 @@ class BgDataDrawable extends WatchUi.Drawable {
             return;
         }
 
-        // Separate the graph to NUM_BGS+1 areas. +1 to shift the graph to the
-        // left until the next reading.
-        //
-        // This is divisible so no need for floating point arithmetic.
-        var spaceBetweenDots = GRAPH_WIDTH / (NUM_BGS + 1);
-
         // Timestamp (in seconds) to the left end of the graph
         var graphLeftSecs = nowSecs - (60 * 60); // one hour
 
@@ -257,7 +250,6 @@ class BgDataDrawable extends WatchUi.Drawable {
     function onPartialUpdate(dc) {
         // System.println("-- BgDataDrawable.onPartialUpdate");
 
-        var app = Application.getApp();
         var nowSecs = Time.now().value();
 
         var nextTemporalEventTime = Background.getTemporalEventRegisteredTime();
