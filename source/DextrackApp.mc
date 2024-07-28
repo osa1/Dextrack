@@ -12,22 +12,7 @@ class DextrackApp extends Application.AppBase {
         Sys.println("-- DextrackApp.initialize");
         AppBase.initialize();
 
-        var work = getProperty(PROP_WORK);
-        if (work == null) {
-            setProperty(PROP_WORK, WORK_LOGIN);
-            setProperty(PROP_ERROR_MSG, MSG_LOGGING_IN);
-        }
-
-        // Schedule the first temporal event.
-        // Note: this block of code is duplicated below, but I can't move it
-        // to a function and call it. It looks liek `setProperty` needs to be
-        // called from one of the overridden methods directly, otherwise it
-        // fails with: "Exception: Background processes cannot modify the
-        // object store".
-        var lastTemporalEventTime = Background.getLastTemporalEventTime();
-        var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
-        setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
-        Background.registerForTemporalEvent(nextEventTime);
+        // NB. temporal events started in DextrackWatchFace.initialize.
     }
 
     // onStart() is called on application start up
@@ -75,7 +60,6 @@ class DextrackApp extends Application.AppBase {
             // bugs/crashes below stopping temporal events. In the common case
             // (no bugs, weird data) we will override this temporal event below.
             var nextEventTime = now.add(FIVE_MINUTES);
-            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
             Sys.println("---- DextrackApp.onBackgroundData temporal event scheduled");
         }
@@ -127,7 +111,6 @@ class DextrackApp extends Application.AppBase {
             // Not reading BG data yet, schedule as soon as possible
             var lastTemporalEventTime = Background.getLastTemporalEventTime();
             var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
-            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
 
         } else {
@@ -141,7 +124,6 @@ class DextrackApp extends Application.AppBase {
                 // Strange case, debug
                 System.println("BG data from future: nowUnixSecs=$1$, lastBgDataUnixSecs=$2$", [nowUnixSecs, lastBgDataUnixSecs]);
                 var nextEventTime = now.add(FIVE_MINUTES);
-                setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
                 Background.registerForTemporalEvent(nextEventTime);
                 return;
             }
@@ -163,7 +145,6 @@ class DextrackApp extends Application.AppBase {
 
             System.println(Lang.format("diff=$1$s nextEvent=$2$s", [diffSecs, nextEventTime.value() - nowUnixSecs]));
 
-            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
         }
     }

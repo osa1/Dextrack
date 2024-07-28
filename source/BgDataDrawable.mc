@@ -72,7 +72,7 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
-        var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
+        var nextEventTimeSecs = Background.getTemporalEventRegisteredTime().value();
         var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
         var nextEventTimeLeftMins = nextEventTimeLeftSecs / 60;
 
@@ -255,7 +255,7 @@ class BgDataDrawable extends WatchUi.Drawable {
         var app = Application.getApp();
         var nowSecs = Time.now().value();
 
-        var nextEventTimeSecs = app.getProperty(PROP_NEXT_EVENT_TIME_SECS);
+        var nextEventTimeSecs = Background.getTemporalEventRegisteredTime().value();
         var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
 
         if (nextEventTimeLeftSecs > 60) {

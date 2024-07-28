@@ -13,9 +13,6 @@ const PROP_SESSION_ID = "SESSION_ID";
 // Holds the error message to show on the screen.
 const PROP_ERROR_MSG = "ERROR_MSG";
 
-// Holds the next time (in seconds) a temporal event will be triggered
-const PROP_NEXT_EVENT_TIME_SECS = "NEXT_EVENT_TIME_SECS";
-
 // `PROP_WORK` value indicating we should get a new session id next.
 const WORK_LOGIN = "LOGIN";
 
