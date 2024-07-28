@@ -19,7 +19,15 @@ class DextrackApp extends Application.AppBase {
         }
 
         // Schedule the first temporal event.
-        scheduleTemporalEvent();
+        // Note: this block of code is duplicated below, but I can't move it
+        // to a function and call it. It looks liek `setProperty` needs to be
+        // called from one of the overridden methods directly, otherwise it
+        // fails with: "Exception: Background processes cannot modify the
+        // object store".
+        var lastTemporalEventTime = Background.getLastTemporalEventTime();
+        var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
+        setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
+        Background.registerForTemporalEvent(nextEventTime);
     }
 
     // onStart() is called on application start up
@@ -117,7 +125,10 @@ class DextrackApp extends Application.AppBase {
         if (data[PROP_BGS] == null) {
 
             // Not reading BG data yet, schedule as soon as possible
-            scheduleTemporalEvent();
+            var lastTemporalEventTime = Background.getLastTemporalEventTime();
+            var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
+            setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
+            Background.registerForTemporalEvent(nextEventTime);
 
         } else {
 
@@ -155,12 +166,5 @@ class DextrackApp extends Application.AppBase {
             setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
             Background.registerForTemporalEvent(nextEventTime);
         }
-    }
-
-    function scheduleTemporalEvent() {
-        var lastTemporalEventTime = Background.getLastTemporalEventTime();
-        var nextEventTime = lastTemporalEventTime.add(FIVE_MINUTES);
-        setProperty(PROP_NEXT_EVENT_TIME_SECS, nextEventTime.value());
-        Background.registerForTemporalEvent(nextEventTime);
     }
 }
