@@ -2,6 +2,9 @@
 
 # Dextrack — a Garmin watch face with blood glucose monitoring
 
+**Note:** This branch has the old Forerunner 245 version of the app. Main branch
+now has the most recent version, for Fenix 7.
+
 Dextrack is a Garmin watch face that shows last hour of blood glucose readings,
 obtained from Dexcom share API.
 
