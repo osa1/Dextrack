@@ -1,4 +1,4 @@
 project.manifest = manifest.xml
 
-fr245.resourcePath = $(fr245.resourcePath)
-fr245m.resourcePath = $(fr245m.resourcePath)
+fenix7spro.resourcePath = $(fenix7spro.resourcePath)
+fenix7spro.resourcePath = $(fenix7spro.resourcePath)

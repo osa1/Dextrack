@@ -11,7 +11,7 @@
         name="@Strings.AppName"
         entry="DextrackApp"
         launcherIcon="@Drawables.LauncherIcon"
-        minApiLevel="3.3.0"
+        minApiLevel="5.0.0"
     >
         <!--
             Use the following from the Visual Studio Code comand palette to edit
@@ -21,7 +21,7 @@
             "Monkey C: Edit Products" - Lets you add or remove any product
         -->
         <iq:products>
-            <iq:product id="fr245"/>
+            <iq:product id="fenix7spro"/>
         </iq:products>
 
         <!--

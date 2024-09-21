@@ -8,7 +8,7 @@ obtained from Dexcom share API.
 **Please make sure to check the official Dexcom app before making bolus or
 eating decisions!**
 
-**Currently only Garmin Forerunner 245 is supported.**
+**Currently only Garmin Fenix 7s Pro is supported.**
 
 ## User interface
 
@@ -96,8 +96,8 @@ const DEX_PASSWORD = "<your Dexcom password>";
 ```
 
 Now you can compile the project as usual (see [Garmin's tutorial][1]), **using
-SDK version 7.2.1**, and copy the generated file (the one with extension
-`.prg`) to your watch (e.g. to `Primary/GARMIN/APPS` in Forerunner 245).
+SDK version 7.3.0**, and copy the generated file (the one with extension
+`.prg`) to your watch (e.g. to `Primary/GARMIN/APPS`).
 
 **If you are in the US**, update "shareous1" in `get_account_id.py` and
 `source/Consts.mc` files to "share2".
