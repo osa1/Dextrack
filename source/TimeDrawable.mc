@@ -53,20 +53,22 @@ class TimeDrawable extends WatchUi.Drawable {
         var screenWidth = dc.getWidth();
         var halfScreenWidth = screenWidth / 2;
 
-        var hrWidth = dc.getTextWidthInPixels(hrStr, largeFont);
-        var mnWidth = dc.getTextWidthInPixels(minStr, largeFont);
+        var numFont = Graphics.getVectorFont({:face => "BionicBold", :size => 105});
+
+        var hrWidth = dc.getTextWidthInPixels(hrStr, numFont);
+        var mnWidth = dc.getTextWidthInPixels(minStr, numFont);
         var timeWidth = hrWidth + mnWidth;
         hhmmWidth = timeWidth;
 
         var timeX = halfScreenWidth - (timeWidth / 2);
-        var timeY = halfScreenWidth - (largeFontHeight / 2);
+        var timeY = halfScreenWidth - (dc.getFontHeight(numFont) / 2);
 
         // Draw hour
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(
             timeX,
             timeY,
-            largeFont,
+            numFont,
             hrStr,
             Graphics.TEXT_JUSTIFY_LEFT
         );
@@ -76,7 +78,7 @@ class TimeDrawable extends WatchUi.Drawable {
         dc.drawText(
             timeX + hrWidth,
             timeY,
-            largeFont,
+            numFont,
             minStr,
             Graphics.TEXT_JUSTIFY_LEFT
         );
@@ -85,64 +87,17 @@ class TimeDrawable extends WatchUi.Drawable {
         var monthStr = WatchUi.loadResource(m_monthResourceArray[now.month - 1]).toUpper();
         var dayStr = now.day.toString();
 
-        // var dateStr = Lang.format("$1$$2$", [now.day, monthStr]);
-
-        // TODO: I don't understand why I need `-15` here, but
-        // `largeFontHeight` seems to be larger than the text height
-        var dateY = timeY + largeFontHeight - 15;
-        var dayWidth = dc.getTextWidthInPixels(dayStr, smallFont);
-        var monthWidth = dc.getTextWidthInPixels(monthStr, smallFont);
-        var dayOfWeekWidth = dc.getTextWidthInPixels(dayOfWeekStr, smallFont);
-        var totalDateTextWidth = dayWidth + monthWidth + dayOfWeekWidth;
-
-        // 3 words, 4 spaces
-        var spaceWidth = (GRAPH_WIDTH - totalDateTextWidth) / 4;
-        var totalDateWidth = totalDateTextWidth;
-        if (spaceWidth > 0) {
-            totalDateWidth += spaceWidth * 4;
-        }
-
-        // graphStart
-        var dateX = (screenWidth - GRAPH_WIDTH) / 2;
-
-        // Draw day
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-        dc.drawText(
-            dateX +  spaceWidth,
-            dateY,
-            smallFont,
-            dayStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        // Draw month
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-        dc.drawText(
-            dateX + dayWidth + (2 * spaceWidth),
-            dateY,
-            smallFont,
-            monthStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        // Draw background for day of week
-        // dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_DK_GREEN);
-        // dc.fillRoundedRectangle(
-        //     dateX + dc.getTextWidthInPixels(dateStr, m_dayOfWeekFont),
-        //     dateY,
-        //     dc.getTextWidthInPixels(dayOfWeekStr, m_dayOfWeekFont) + 6,
-        //     smallFontHeight,
-        //     2
-        // );
-
-        // Draw day of week
-        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            dateX + dayWidth + monthWidth + (3 * spaceWidth),
-            dateY,
-            smallFont,
-            dayOfWeekStr,
-            Graphics.TEXT_JUSTIFY_LEFT
+        var dateStr = Lang.format("$1$ $2$ $3$", [now.day, monthStr, dayOfWeekStr]);
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawRadialText(
+            halfScreenWidth,
+            halfScreenWidth,
+            Graphics.getVectorFont({:face => "BionicBold", :size => 26}),
+            dateStr,
+            Graphics.TEXT_JUSTIFY_CENTER,
+            180 + 30 + 60,
+            halfScreenWidth,
+            Graphics.RADIAL_TEXT_DIRECTION_COUNTER_CLOCKWISE
         );
 
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +108,7 @@ class TimeDrawable extends WatchUi.Drawable {
         var batteryIconHeight = smallFontHeight - 4;
 
         var batteryLevelFloat = System.getSystemStats().battery;
-	var batteryLevel = Math.floor(batteryLevelFloat).toLong();
+    	var batteryLevel = Math.floor(batteryLevelFloat).toLong();
 
         // Center the battery icon in the space right of HHMM
         var batteryIconMaxWidth = halfScreenWidth - (timeWidth / 2);
@@ -175,54 +130,25 @@ class TimeDrawable extends WatchUi.Drawable {
             batteryColor = Graphics.COLOR_DK_GREEN;
         }
 
-        // Draw battery frame body
-        dc.setColor(batteryColor, Graphics.COLOR_TRANSPARENT);
-	dc.setPenWidth(2);
-
-        dc.drawRoundedRectangle(
-            batteryX,
-            batteryY,
-            batteryIconWidth - 5,
-            batteryIconHeight,
-            2
-        );
-
-        // Draw battery head
-        dc.fillRoundedRectangle(
-            batteryX + batteryIconWidth - 4,
-            batteryY + 5,
-            3,
-            batteryIconHeight - 10,
-            2
-        );
-
-        var batteryTotalFillWidth = batteryIconWidth - 12;
-        var batteryFillWidth = (batteryTotalFillWidth.toDouble() * batteryLevelFloat) / 100.0;
-
-        // Draw filler
-        dc.fillRectangle(
-            batteryX + 3,
-            batteryY + 3,
-            batteryFillWidth,
-            batteryIconHeight - 7
-        );
-
         // Draw battery percentage text
-        var batteryLevelStr = Lang.format("$1$%", [batteryLevel]);
-        var batteryLevelStrWidth = dc.getTextWidthInPixels(batteryLevelStr, smallFont);
+        var batteryLevelStr = Lang.format("BATT $1$%", [batteryLevel]);
         dc.setColor(batteryColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            batteryX + ((batteryIconWidth - batteryLevelStrWidth) / 2),
-            batteryY + smallFontHeight - 4,
-            smallFont,
+        dc.drawRadialText(
+            halfScreenWidth,
+            halfScreenWidth,
+            Graphics.getVectorFont({:face => "BionicBold", :size => 26}),
             batteryLevelStr,
-            Graphics.TEXT_JUSTIFY_LEFT
+            Graphics.TEXT_JUSTIFY_CENTER,
+            180 + 30,
+            halfScreenWidth,
+            Graphics.RADIAL_TEXT_DIRECTION_COUNTER_CLOCKWISE
         );
     }
 
     function onPartialUpdate(dc) {
         // System.println("-- TimeDrawable.onPartialUpdate");
 
+/*
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Clear clip area
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,5 +181,6 @@ class TimeDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(clipStartX, clipStartY, smallFont, secStr, Graphics.TEXT_JUSTIFY_LEFT);
+*/
     }
 }

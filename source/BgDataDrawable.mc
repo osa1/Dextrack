@@ -40,6 +40,7 @@ class BgDataDrawable extends WatchUi.Drawable {
 
     function draw(dc) {
         var app = Application.getApp();
+        var smallFont = Graphics.getVectorFont({:face => "BionicBold", :size => 26});
 
         var screenHeight = dc.getHeight();
         var screenWidth = dc.getWidth();
@@ -51,6 +52,8 @@ class BgDataDrawable extends WatchUi.Drawable {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Draw graph lines
         ////////////////////////////////////////////////////////////////////////////////////////////
+
+        dc.setPenWidth(2);
 
         // Upper line
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
@@ -81,9 +84,9 @@ class BgDataDrawable extends WatchUi.Drawable {
             var nextEventTimeLeftSecs = nextEventTimeSecs - nowSecs;
 
             if (nextEventTimeLeftSecs < 60) {
-                nextEventTimeText = Lang.format("$1$s", [nextEventTimeLeftSecs]);
+                nextEventTimeText = Lang.format("Next $1$s", [nextEventTimeLeftSecs]);
             } else {
-                nextEventTimeText = Lang.format("$1$m", [nextEventTimeLeftSecs / 60]);
+                nextEventTimeText = Lang.format("Next $1$m", [nextEventTimeLeftSecs / 60]);
             }
         }
 
@@ -118,25 +121,45 @@ class BgDataDrawable extends WatchUi.Drawable {
             // we consider less than 10 minutes old as recent.
             if (diffSecs < 10 * 60) {
                 var bgText = bgs[NUM_BGS - 1]["bg"].toString();
-                var textWidth = dc.getTextWidthInPixels(bgText, largeFont);
+                var textWidth = dc.getTextWidthInPixels(bgText, Graphics.FONT_NUMBER_MEDIUM);
                 var textX = (screenWidth - textWidth) / 2;
                 var textY = ((screenHeight - timeDrawableHeight - largeFontHeight) / 2) - 10;
-                dc.drawText(textX, textY, largeFont, bgText, Graphics.TEXT_JUSTIFY_LEFT);
+                dc.drawText(textX, textY, Graphics.FONT_NUMBER_MEDIUM, bgText, Graphics.TEXT_JUSTIFY_LEFT);
 
                 // Show how long ago the shown bg was read
                 if (diffMins != 0) {
-                    var diffMinsText = Lang.format("-$1$m", [diffMins]);
+                    var diffMinsText = Lang.format("Age $1$m", [diffMins]);
                     var diffMinsTextWidth = dc.getTextWidthInPixels(diffMinsText, smallFont);
                     var diffMinsTextX = textX - diffMinsTextWidth - 10;
                     var diffMinsTextY = textY + largeFontHeight - smallFontHeight - 12 - smallFontHeight + 5;
-                    dc.drawText(diffMinsTextX, diffMinsTextY, smallFont, diffMinsText, Graphics.TEXT_JUSTIFY_LEFT);
+                    // dc.drawText(diffMinsTextX, diffMinsTextY, smallFont, diffMinsText, Graphics.TEXT_JUSTIFY_LEFT);
+                    dc.drawRadialText(
+                        screenWidth / 2,
+                        screenHeight / 2,
+                        smallFont,
+                        diffMinsText,
+                        Graphics.TEXT_JUSTIFY_CENTER,
+                        90 + 60,
+                        100,
+                        Graphics.RADIAL_TEXT_DIRECTION_CLOCKWISE
+                    );
                 }
 
                 // Show time until next request
                 nextEventTimeTextWidth = dc.getTextWidthInPixels(nextEventTimeText, smallFont);
                 nextEventTimeTextX = textX - nextEventTimeTextWidth - 10;
                 nextEventTimeTextY = textY + largeFontHeight - smallFontHeight - 12;
-                dc.drawText(nextEventTimeTextX, nextEventTimeTextY, smallFont, nextEventTimeText, Graphics.TEXT_JUSTIFY_LEFT);
+
+                dc.drawRadialText(
+                    screenWidth / 2,
+                    screenHeight / 2,
+                    smallFont,
+                    nextEventTimeText,
+                    Graphics.TEXT_JUSTIFY_CENTER,
+                    30,
+                    100,
+                    Graphics.RADIAL_TEXT_DIRECTION_CLOCKWISE
+                );
 
                 // Show bg change rate
                 var prevBg = bgs[NUM_BGS - 2];
@@ -163,10 +186,21 @@ class BgDataDrawable extends WatchUi.Drawable {
                         rateStr = rateStr.substring(0, 3);
                     }
 
-                    var rateText = Lang.format("$1$$2$/m", [sign, rateStr]);
+                    var rateText = Lang.format("Rate $1$$2$/m", [sign, rateStr]);
                     var rateTextX = textX + textWidth + 5;
                     var rateTextY = textY + largeFontHeight - smallFontHeight - 12;
-                    dc.drawText(rateTextX, rateTextY, smallFont, rateText, Graphics.TEXT_JUSTIFY_LEFT);
+                    // dc.drawText(rateTextX, rateTextY, smallFont, rateText, Graphics.TEXT_JUSTIFY_LEFT);
+
+                    dc.drawRadialText(
+                        screenWidth / 2,
+                        screenHeight / 2,
+                        smallFont,
+                        rateText,
+                        Graphics.TEXT_JUSTIFY_CENTER,
+                        90,
+                        100,
+                        Graphics.RADIAL_TEXT_DIRECTION_CLOCKWISE
+                    );
                 }
             } else {
                 drawLine1_2(dc, "REQ. RECENT DATA");
@@ -225,6 +259,48 @@ class BgDataDrawable extends WatchUi.Drawable {
                 dc.fillRectangle(dotX, dotY, 5, 5);
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Draw separators
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        dc.setPenWidth(5);
+        // dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_TRANSPARENT);
+        var xFactor = Math.sin(Math.toRadians(135));
+        var yFactor = Math.cos(Math.toRadians(135));
+
+        dc.drawLine(
+            (screenWidth / 2) + 100 * xFactor,
+            (screenHeight / 2) + 100 * yFactor,
+            (screenWidth / 2) + 120 * xFactor,
+            (screenHeight / 2) + 120 * yFactor);
+
+        xFactor = Math.sin(Math.toRadians(225));
+        yFactor = Math.cos(Math.toRadians(225));
+
+        dc.drawLine(
+            (screenWidth / 2) + 100 * xFactor,
+            (screenHeight / 2) + 100 * yFactor,
+            (screenWidth / 2) + 120 * xFactor,
+            (screenHeight / 2) + 120 * yFactor);
+
+        xFactor = Math.sin(Math.toRadians(315));
+        yFactor = Math.cos(Math.toRadians(315));
+
+        dc.drawLine(
+            (screenWidth / 2) + 100 * xFactor,
+            (screenHeight / 2) + 100 * yFactor,
+            (screenWidth / 2) + 120 * xFactor,
+            (screenHeight / 2) + 120 * yFactor);
+
+        xFactor = Math.sin(Math.toRadians(405));
+        yFactor = Math.cos(Math.toRadians(405));
+
+        dc.drawLine(
+            (screenWidth / 2) + 100 * xFactor,
+            (screenHeight / 2) + 100 * yFactor,
+            (screenWidth / 2) + 120 * xFactor,
+            (screenHeight / 2) + 120 * yFactor);
     }
 
     function drawLine1_2(dc, text) {

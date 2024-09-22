@@ -29,7 +29,6 @@ class DextrackWatchFace extends WatchUi.WatchFace {
     // Load resources here.
     function onLayout(dc as Graphics.Dc) as Void {
         // Sys.println("-- DextrackWatchFace.onLayout");
-
         largeFont = WatchUi.loadResource(Rez.Fonts.LargeFont);
         smallFont = WatchUi.loadResource(Rez.Fonts.SmallFont);
 
@@ -58,8 +57,8 @@ class DextrackWatchFace extends WatchUi.WatchFace {
 
         // Call the parent onUpdate function to redraw the layout.
         View.onUpdate(dc);
-        timeDrawable.onPartialUpdate(dc);
-        bgDataDrawable.onPartialUpdate(dc);
+        // timeDrawable.onPartialUpdate(dc);
+        // bgDataDrawable.onPartialUpdate(dc);
 
         startTemporalEvent();
     }
