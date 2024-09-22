@@ -4,7 +4,10 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
-(:background)
+// https://forums.garmin.com/developer/connect-iq/f/discussion/324155/onbackgrounddata-not-called
+// suggets :background with :background_app somehow works better. No official documentation on the
+// issue..
+(:background, :background_app)
 class BgDataService extends System.ServiceDelegate {
     function initialize() {
         ServiceDelegate.initialize();
