@@ -8,6 +8,9 @@ class TimeDrawable extends WatchUi.Drawable {
     private var m_weekResourceArray, m_monthResourceArray;
     private var hhmmWidth;
 
+    private var largeFont;
+    private var smallFont;
+
     function initialize(params) {
         // System.println("-- TimeDrawable.initialize");
 
@@ -37,6 +40,9 @@ class TimeDrawable extends WatchUi.Drawable {
             Rez.Strings.Nov,
             Rez.Strings.Dec
         ];
+
+        largeFont = WatchUi.loadResource(Rez.Fonts.LargeFont);
+        smallFont = WatchUi.loadResource(Rez.Fonts.SmallFont);
     }
 
     function draw(dc) {

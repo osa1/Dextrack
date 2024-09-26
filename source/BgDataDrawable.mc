@@ -32,10 +32,16 @@ class BgDataDrawable extends WatchUi.Drawable {
     private var nextEventTimeTextX;
     private var nextEventTimeTextY;
 
+    private var largeFont;
+    private var smallFont;
+
     function initialize(params) {
        // System.println("-- BgDataDrawable.initialize");
 
        Drawable.initialize(params);
+
+       largeFont = WatchUi.loadResource(Rez.Fonts.LargeFont);
+       smallFont = WatchUi.loadResource(Rez.Fonts.SmallFont);
     }
 
     function draw(dc) {
