@@ -42,6 +42,9 @@ class TimeDrawable extends WatchUi.Drawable {
     function draw(dc) {
         // System.println("-- TimeDrawable.draw");
 
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var smallFontHeight = dc.getFontHeight(smallFont);
+
         dc.clearClip();
         dc.clear();
 
@@ -153,7 +156,7 @@ class TimeDrawable extends WatchUi.Drawable {
         var batteryIconHeight = smallFontHeight - 4;
 
         var batteryLevelFloat = System.getSystemStats().battery;
-	var batteryLevel = Math.floor(batteryLevelFloat).toLong();
+        var batteryLevel = Math.floor(batteryLevelFloat).toLong();
 
         // Center the battery icon in the space right of HHMM
         var batteryIconMaxWidth = halfScreenWidth - (timeWidth / 2);
@@ -177,7 +180,7 @@ class TimeDrawable extends WatchUi.Drawable {
 
         // Draw battery frame body
         dc.setColor(batteryColor, Graphics.COLOR_TRANSPARENT);
-	dc.setPenWidth(2);
+        dc.setPenWidth(2);
 
         dc.drawRoundedRectangle(
             batteryX,
@@ -226,6 +229,9 @@ class TimeDrawable extends WatchUi.Drawable {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Clear clip area
         ////////////////////////////////////////////////////////////////////////////////////////////
+
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var smallFontHeight = dc.getFontHeight(smallFont);
 
         var screenWidth = dc.getWidth();
         var screenHeight = screenWidth;

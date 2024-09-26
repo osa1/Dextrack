@@ -52,6 +52,10 @@ class BgDataDrawable extends WatchUi.Drawable {
         // Draw graph lines
         ////////////////////////////////////////////////////////////////////////////////////////////
 
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var smallFontHeight = dc.getFontHeight(smallFont);
+        var timeDrawableHeight = largeFontHeight + smallFontHeight;
+
         // Upper line
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
         var upperY = (screenHeight / 2) + (timeDrawableHeight / 2);
@@ -89,8 +93,8 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         var errMsg = app.getProperty(PROP_ERROR_MSG);
         if (errMsg != null) {
-            drawLine1_2(dc, errMsg);
-            drawLine2_2_nextEventTime(dc, nextEventTimeText);
+            drawLine1_2(dc, errMsg, timeDrawableHeight);
+            drawLine2_2_nextEventTime(dc, nextEventTimeText, timeDrawableHeight);
         }
 
         var bgs = app.getProperty(PROP_BGS) as Lang.Array<Lang.Number>;
@@ -169,8 +173,8 @@ class BgDataDrawable extends WatchUi.Drawable {
                     dc.drawText(rateTextX, rateTextY, smallFont, rateText, Graphics.TEXT_JUSTIFY_LEFT);
                 }
             } else {
-                drawLine1_2(dc, "REQ. RECENT DATA");
-                drawLine2_2_nextEventTime(dc, nextEventTimeText);
+                drawLine1_2(dc, "REQ. RECENT DATA", timeDrawableHeight);
+                drawLine2_2_nextEventTime(dc, nextEventTimeText, timeDrawableHeight);
             }
         }
 
@@ -227,9 +231,11 @@ class BgDataDrawable extends WatchUi.Drawable {
         }
     }
 
-    function drawLine1_2(dc, text) {
+    function drawLine1_2(dc, text, timeDrawableHeight) {
         var screenHeight = dc.getHeight();
         var screenWidth = dc.getWidth();
+
+        var smallFontHeight = dc.getFontHeight(smallFont);
 
         var textWidth = dc.getTextWidthInPixels(text, smallFont);
         var textX = (screenWidth - textWidth) / 2;
@@ -237,7 +243,7 @@ class BgDataDrawable extends WatchUi.Drawable {
         dc.drawText(textX, textY, smallFont, text, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
-    function drawLine2_2_nextEventTime(dc, text) {
+    function drawLine2_2_nextEventTime(dc, text, timeDrawableHeight) {
         var screenHeight = dc.getHeight();
         var screenWidth = dc.getWidth();
 
@@ -279,6 +285,7 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         nextEventTimeTextWidth = newNextEventTimeTextWidth;
 
+        var smallFontHeight = dc.getFontHeight(smallFont);
         var clipStartY = nextEventTimeTextY;
         var clipHeight = smallFontHeight;
 

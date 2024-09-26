@@ -7,10 +7,7 @@ using Toybox.Time;
 using Toybox.WatchUi;
 
 var largeFont;
-var largeFontHeight;
 var smallFont;
-var smallFontHeight;
-var timeDrawableHeight;
 
 const FIVE_MINUTES = new Time.Duration(5 * 60);
 
@@ -23,6 +20,14 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         Sys.println("-- DextrackWatchFace.initialize");
         WatchFace.initialize();
 
+        // Load fonts before the drawables to make sure fonts will be available
+        // in the `draw` methods.
+        largeFont = WatchUi.loadResource(Rez.Fonts.LargeFont);
+        smallFont = WatchUi.loadResource(Rez.Fonts.SmallFont);
+
+        timeDrawable = View.findDrawableById("Time");
+        bgDataDrawable = View.findDrawableById("BgData");
+
         startTemporalEvent();
     }
 
@@ -30,17 +35,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
     function onLayout(dc as Graphics.Dc) as Void {
         // Sys.println("-- DextrackWatchFace.onLayout");
 
-        largeFont = WatchUi.loadResource(Rez.Fonts.LargeFont);
-        smallFont = WatchUi.loadResource(Rez.Fonts.SmallFont);
-
-        largeFontHeight = dc.getFontHeight(largeFont);
-        smallFontHeight = dc.getFontHeight(smallFont);
-        timeDrawableHeight = largeFontHeight + smallFontHeight;
-
         setLayout(Rez.Layouts.WatchFace(dc));
-
-        timeDrawable = View.findDrawableById("Time");
-        bgDataDrawable = View.findDrawableById("BgData");
     }
 
     // Called when this View is brought to the foreground. Restore the state of
@@ -58,8 +53,17 @@ class DextrackWatchFace extends WatchUi.WatchFace {
 
         // Call the parent onUpdate function to redraw the layout.
         View.onUpdate(dc);
-        timeDrawable.onPartialUpdate(dc);
-        bgDataDrawable.onPartialUpdate(dc);
+
+        // At least in the sim, `initialize`, `onUpdate`, and `draw` methods
+        // seem to be racing or running concurrently, so we don't assume that
+        // `initialize` has been run to completion here.
+        if (timeDrawable != null) {
+            timeDrawable.onPartialUpdate(dc);
+        }
+
+        if (bgDataDrawable != null) {
+            bgDataDrawable.onPartialUpdate(dc);
+        }
 
         startTemporalEvent();
     }
@@ -67,8 +71,13 @@ class DextrackWatchFace extends WatchUi.WatchFace {
     function onPartialUpdate(dc as Graphics.Dc) as Void {
         // Sys.println("-- DextractWatchFace.onPartialUpdate");
         if (inLowPowerMode) {
-            timeDrawable.onPartialUpdate(dc);
-            bgDataDrawable.onPartialUpdate(dc);
+            // See comments in `onUpdate` on these null checks.
+            if (timeDrawable != null) {
+                timeDrawable.onPartialUpdate(dc);
+            }
+            if (bgDataDrawable != null) {
+                bgDataDrawable.onPartialUpdate(dc);
+            }
         }
 
         startTemporalEvent();
