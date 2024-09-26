@@ -83,70 +83,7 @@ class TimeDrawable extends WatchUi.Drawable {
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
-        var dayOfWeekStr = WatchUi.loadResource(m_weekResourceArray[now.day_of_week - 1]).toUpper();
-        var monthStr = WatchUi.loadResource(m_monthResourceArray[now.month - 1]).toUpper();
-        var dayStr = now.day.toString();
-
-        // var dateStr = Lang.format("$1$$2$", [now.day, monthStr]);
-
-        // TODO: I don't understand why I need `-15` here, but
-        // `largeFontHeight` seems to be larger than the text height
-        var dateY = timeY + largeFontHeight - 15;
-        var dayWidth = dc.getTextWidthInPixels(dayStr, smallFont);
-        var monthWidth = dc.getTextWidthInPixels(monthStr, smallFont);
-        var dayOfWeekWidth = dc.getTextWidthInPixels(dayOfWeekStr, smallFont);
-        var totalDateTextWidth = dayWidth + monthWidth + dayOfWeekWidth;
-
-        // 3 words, 4 spaces
-        var spaceWidth = (GRAPH_WIDTH - totalDateTextWidth) / 4;
-        var totalDateWidth = totalDateTextWidth;
-        if (spaceWidth > 0) {
-            totalDateWidth += spaceWidth * 4;
-        }
-
-        // graphStart
-        var dateX = (screenWidth - GRAPH_WIDTH) / 2;
-
-        // Draw day
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-        dc.drawText(
-            dateX +  spaceWidth,
-            dateY,
-            smallFont,
-            dayStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        // Draw month
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-        dc.drawText(
-            dateX + dayWidth + (2 * spaceWidth),
-            dateY,
-            smallFont,
-            monthStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        // Draw background for day of week
-        // dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_DK_GREEN);
-        // dc.fillRoundedRectangle(
-        //     dateX + dc.getTextWidthInPixels(dateStr, m_dayOfWeekFont),
-        //     dateY,
-        //     dc.getTextWidthInPixels(dayOfWeekStr, m_dayOfWeekFont) + 6,
-        //     smallFontHeight,
-        //     2
-        // );
-
-        // Draw day of week
-        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(
-            dateX + dayWidth + monthWidth + (3 * spaceWidth),
-            dateY,
-            smallFont,
-            dayOfWeekStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
+        drawDate(dc, now, timeY);
         drawBattery(dc, timeWidth);
     }
 
@@ -188,6 +125,74 @@ class TimeDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(clipStartX, clipStartY, smallFont, secStr, Graphics.TEXT_JUSTIFY_LEFT);
+    }
+
+    function drawDate(dc, now, timeY) {
+        var dayOfWeekStr = WatchUi.loadResource(m_weekResourceArray[now.day_of_week - 1]).toUpper();
+        var monthStr = WatchUi.loadResource(m_monthResourceArray[now.month - 1]).toUpper();
+        var dayStr = now.day.toString();
+
+        // var dateStr = Lang.format("$1$$2$", [now.day, monthStr]);
+
+        // TODO: I don't understand why I need `-15` here, but
+        // `largeFontHeight` seems to be larger than the text height
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var dateY = timeY + largeFontHeight - 15;
+        var dayWidth = dc.getTextWidthInPixels(dayStr, smallFont);
+        var monthWidth = dc.getTextWidthInPixels(monthStr, smallFont);
+        var dayOfWeekWidth = dc.getTextWidthInPixels(dayOfWeekStr, smallFont);
+        var totalDateTextWidth = dayWidth + monthWidth + dayOfWeekWidth;
+
+        // 3 words, 4 spaces
+        var spaceWidth = (GRAPH_WIDTH - totalDateTextWidth) / 4;
+        var totalDateWidth = totalDateTextWidth;
+        if (spaceWidth > 0) {
+            totalDateWidth += spaceWidth * 4;
+        }
+
+        // graphStart
+        var screenWidth = dc.getWidth();
+        var dateX = (screenWidth - GRAPH_WIDTH) / 2;
+
+        // Draw day
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+        dc.drawText(
+            dateX +  spaceWidth,
+            dateY,
+            smallFont,
+            dayStr,
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        // Draw month
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+        dc.drawText(
+            dateX + dayWidth + (2 * spaceWidth),
+            dateY,
+            smallFont,
+            monthStr,
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        // Draw background for day of week
+        // dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_DK_GREEN);
+        // dc.fillRoundedRectangle(
+        //     dateX + dc.getTextWidthInPixels(dateStr, m_dayOfWeekFont),
+        //     dateY,
+        //     dc.getTextWidthInPixels(dayOfWeekStr, m_dayOfWeekFont) + 6,
+        //     smallFontHeight,
+        //     2
+        // );
+
+        // Draw day of week
+        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(
+            dateX + dayWidth + monthWidth + (3 * spaceWidth),
+            dateY,
+            smallFont,
+            dayOfWeekStr,
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
     }
 
     function drawBattery(dc, timeWidth) {
