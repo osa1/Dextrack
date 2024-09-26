@@ -43,7 +43,6 @@ class TimeDrawable extends WatchUi.Drawable {
         // System.println("-- TimeDrawable.draw");
 
         var largeFontHeight = dc.getFontHeight(largeFont);
-        var smallFontHeight = dc.getFontHeight(smallFont);
 
         dc.clearClip();
         dc.clear();
@@ -148,9 +147,54 @@ class TimeDrawable extends WatchUi.Drawable {
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
+        drawBattery(dc, timeWidth);
+    }
+
+    function onPartialUpdate(dc) {
+        // System.println("-- TimeDrawable.onPartialUpdate");
+
         ////////////////////////////////////////////////////////////////////////////////////////////
-        // Draw battery
+        // Clear clip area
         ////////////////////////////////////////////////////////////////////////////////////////////
+
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var smallFontHeight = dc.getFontHeight(smallFont);
+
+        var screenWidth = dc.getWidth();
+        var screenHeight = screenWidth;
+        var halfScreenWidth = screenWidth / 2;
+        var halfScreenHeight = screenHeight / 2;
+
+        var clipStartY = halfScreenHeight + (largeFontHeight / 2) - smallFontHeight - 13;
+        var clipHeight = smallFontHeight;
+
+        var clipStartX = halfScreenWidth + (hhmmWidth / 2);
+        var clipWidth = 20; // enough for "ss" in small font
+
+        dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
+
+        // Fill the clip, for debugging
+        // dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
+        // dc.fillRectangle(clipStartX, clipStartY, clipWidth, clipHeight);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Render second
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        var sec = System.getClockTime().sec;
+        var secStr = sec.format("%02d");
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        dc.drawText(clipStartX, clipStartY, smallFont, secStr, Graphics.TEXT_JUSTIFY_LEFT);
+    }
+
+    function drawBattery(dc, timeWidth) {
+        var smallFontHeight = dc.getFontHeight(smallFont);
+
+        var screenWidth = dc.getWidth();
+        var halfScreenWidth = screenWidth / 2;
 
         var batteryIconWidth = dc.getTextWidthInPixels("100%", smallFont);
         var batteryIconHeight = smallFontHeight - 4;
@@ -221,45 +265,5 @@ class TimeDrawable extends WatchUi.Drawable {
             batteryLevelStr,
             Graphics.TEXT_JUSTIFY_LEFT
         );
-    }
-
-    function onPartialUpdate(dc) {
-        // System.println("-- TimeDrawable.onPartialUpdate");
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Clear clip area
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        var largeFontHeight = dc.getFontHeight(largeFont);
-        var smallFontHeight = dc.getFontHeight(smallFont);
-
-        var screenWidth = dc.getWidth();
-        var screenHeight = screenWidth;
-        var halfScreenWidth = screenWidth / 2;
-        var halfScreenHeight = screenHeight / 2;
-
-        var clipStartY = halfScreenHeight + (largeFontHeight / 2) - smallFontHeight - 13;
-        var clipHeight = smallFontHeight;
-
-        var clipStartX = halfScreenWidth + (hhmmWidth / 2);
-        var clipWidth = 20; // enough for "ss" in small font
-
-        dc.setClip(clipStartX, clipStartY, clipWidth, clipHeight);
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
-        dc.clear();
-
-        // Fill the clip, for debugging
-        // dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
-        // dc.fillRectangle(clipStartX, clipStartY, clipWidth, clipHeight);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Render second
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        var sec = System.getClockTime().sec;
-        var secStr = sec.format("%02d");
-
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        dc.drawText(clipStartX, clipStartY, smallFont, secStr, Graphics.TEXT_JUSTIFY_LEFT);
     }
 }
