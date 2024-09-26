@@ -44,31 +44,10 @@ class BgDataDrawable extends WatchUi.Drawable {
         var screenHeight = dc.getHeight();
         var screenWidth = dc.getWidth();
 
+        var bgs = app.getProperty(PROP_BGS) as Lang.Array<Lang.Number>;
         var nowSecs = Time.now().value();
 
-        var graphStart = (screenWidth - GRAPH_WIDTH) / 2;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Draw graph lines
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        var largeFontHeight = dc.getFontHeight(largeFont);
-        var smallFontHeight = dc.getFontHeight(smallFont);
-        var timeDrawableHeight = largeFontHeight + smallFontHeight;
-
-        // Upper line
-        dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
-        var upperY = (screenHeight / 2) + (timeDrawableHeight / 2);
-        dc.drawLine(graphStart, upperY, graphStart + GRAPH_WIDTH, upperY);
-
-        // Lower line
-        dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
-        var lowerY = upperY + GRAPH_HEIGHT;
-        dc.drawLine(graphStart, lowerY, graphStart + GRAPH_WIDTH, lowerY);
-
-        // Mid line
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_LT_GRAY);
-        dc.drawLine(graphStart, upperY + 20, graphStart + GRAPH_WIDTH, upperY + 20);
+        drawGraph(dc, bgs, nowSecs);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Draw current BG, or error message
@@ -91,13 +70,15 @@ class BgDataDrawable extends WatchUi.Drawable {
             }
         }
 
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var smallFontHeight = dc.getFontHeight(smallFont);
+        var timeDrawableHeight = largeFontHeight + smallFontHeight;
+
         var errMsg = app.getProperty(PROP_ERROR_MSG);
         if (errMsg != null) {
             drawLine1_2(dc, errMsg, timeDrawableHeight);
             drawLine2_2_nextEventTime(dc, nextEventTimeText, timeDrawableHeight);
         }
-
-        var bgs = app.getProperty(PROP_BGS) as Lang.Array<Lang.Number>;
 
         if (bgs == null || bgs.size() == 0) {
             // TODO: Not sure when exactly this can happen, log it to debug later
@@ -177,58 +158,6 @@ class BgDataDrawable extends WatchUi.Drawable {
                 drawLine2_2_nextEventTime(dc, nextEventTimeText, timeDrawableHeight);
             }
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Draw points
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        if (bgs == null) {
-            // System.println("bgs == null, returning");
-            return;
-        }
-
-        // Timestamp (in seconds) to the left end of the graph
-        var graphLeftSecs = nowSecs - (60 * 60); // one hour
-
-        var minuteWidth = GRAPH_WIDTH / 60;
-
-        for (var dotIdx = 0; dotIdx < NUM_BGS; dotIdx += 1) {
-            var bgData = bgs[dotIdx];
-
-            if (bgData == null) {
-                continue;
-            }
-
-            var bg = bgData["bg"];
-            var bgTs = bgData["ts"];
-            var bgTsSecs = bgTs / 1000;
-            diffSecs = bgTsSecs - graphLeftSecs;
-            diffMins = Math.round(diffSecs.toDouble() / 60.0).toLong();
-            var dotX = graphStart + (diffMins * minuteWidth);
-
-            // System.println(Lang.format(
-            //     "bgTs = $1$, bgTsSecs = $2$, diffSecs = $3$, dotX = $4$",
-            //     [bgTs, bgTsSecs, diffSecs, dotX]
-            // ));
-
-            if (dotX < graphStart) {
-                continue;
-            }
-
-            if (bg < 80) {
-                dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
-                var dotY = lowerY;
-                dc.fillPolygon([[dotX - 3, dotY], [dotX, dotY + 4], [dotX + 3, dotY]]);
-            } else if (bg > 200) {
-                dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_DK_BLUE);
-                var dotY = upperY;
-                dc.fillPolygon([[dotX - 3, dotY], [dotX, dotY - 4], [dotX + 3, dotY]]);
-            } else {
-                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
-                var dotY = (upperY + GRAPH_HEIGHT) - Math.round((GRAPH_HEIGHT.toDouble() / 120.0) * (bg - 80).toDouble()).toLong();
-                dc.fillRectangle(dotX, dotY, 5, 5);
-            }
-        }
     }
 
     function drawLine1_2(dc, text, timeDrawableHeight) {
@@ -297,5 +226,85 @@ class BgDataDrawable extends WatchUi.Drawable {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(nextEventTimeTextX, nextEventTimeTextY, smallFont, nextEventTimeText, Graphics.TEXT_JUSTIFY_LEFT);
+    }
+
+    function drawGraph(dc, bgs, nowSecs) {
+        var screenHeight = dc.getHeight();
+        var screenWidth = dc.getWidth();
+        var graphStart = (screenWidth - GRAPH_WIDTH) / 2;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Draw graph lines
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        var largeFontHeight = dc.getFontHeight(largeFont);
+        var smallFontHeight = dc.getFontHeight(smallFont);
+        var timeDrawableHeight = largeFontHeight + smallFontHeight;
+
+        // Upper line
+        dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
+        var upperY = (screenHeight / 2) + (timeDrawableHeight / 2);
+        dc.drawLine(graphStart, upperY, graphStart + GRAPH_WIDTH, upperY);
+
+        // Lower line
+        dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
+        var lowerY = upperY + GRAPH_HEIGHT;
+        dc.drawLine(graphStart, lowerY, graphStart + GRAPH_WIDTH, lowerY);
+
+        // Mid line
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_LT_GRAY);
+        dc.drawLine(graphStart, upperY + 20, graphStart + GRAPH_WIDTH, upperY + 20);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Draw points
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (bgs == null) {
+            // System.println("bgs == null, returning");
+            return;
+        }
+
+        // Timestamp (in seconds) to the left end of the graph
+        var graphLeftSecs = nowSecs - (60 * 60); // one hour
+
+        var minuteWidth = GRAPH_WIDTH / 60;
+
+        for (var dotIdx = 0; dotIdx < NUM_BGS; dotIdx += 1) {
+            var bgData = bgs[dotIdx];
+
+            if (bgData == null) {
+                continue;
+            }
+
+            var bg = bgData["bg"];
+            var bgTs = bgData["ts"];
+            var bgTsSecs = bgTs / 1000;
+            var diffSecs = bgTsSecs - graphLeftSecs;
+            var diffMins = Math.round(diffSecs.toDouble() / 60.0).toLong();
+            var dotX = graphStart + (diffMins * minuteWidth);
+
+            // System.println(Lang.format(
+            //     "bgTs = $1$, bgTsSecs = $2$, diffSecs = $3$, dotX = $4$",
+            //     [bgTs, bgTsSecs, diffSecs, dotX]
+            // ));
+
+            if (dotX < graphStart) {
+                continue;
+            }
+
+            if (bg < 80) {
+                dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
+                var dotY = lowerY;
+                dc.fillPolygon([[dotX - 3, dotY], [dotX, dotY + 4], [dotX + 3, dotY]]);
+            } else if (bg > 200) {
+                dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_DK_BLUE);
+                var dotY = upperY;
+                dc.fillPolygon([[dotX - 3, dotY], [dotX, dotY - 4], [dotX + 3, dotY]]);
+            } else {
+                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_WHITE);
+                var dotY = (upperY + GRAPH_HEIGHT) - Math.round((GRAPH_HEIGHT.toDouble() / 120.0) * (bg - 80).toDouble()).toLong();
+                dc.fillRectangle(dotX, dotY, 5, 5);
+            }
+        }
     }
 }
