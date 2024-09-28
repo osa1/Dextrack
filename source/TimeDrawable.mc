@@ -48,48 +48,13 @@ class TimeDrawable extends WatchUi.Drawable {
     function draw(dc) {
         // System.println("-- TimeDrawable.draw");
 
-        var largeFontHeight = dc.getFontHeight(largeFont);
-
         dc.clearClip();
         dc.clear();
 
         var now = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
 
-        var hrStr = now.hour.format("%02d");
-        var minStr = now.min.format("%02d");
-
-        var screenWidth = dc.getWidth();
-        var halfScreenWidth = screenWidth / 2;
-
-        var hrWidth = dc.getTextWidthInPixels(hrStr, largeFont);
-        var mnWidth = dc.getTextWidthInPixels(minStr, largeFont);
-        var timeWidth = hrWidth + mnWidth;
-        hhmmWidth = timeWidth;
-
-        var timeX = halfScreenWidth - (timeWidth / 2);
-        var timeY = halfScreenWidth - (largeFontHeight / 2);
-
-        // Draw hour
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        dc.drawText(
-            timeX,
-            timeY,
-            largeFont,
-            hrStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        // Draw minute
-        dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK);
-        dc.drawText(
-            timeX + hrWidth,
-            timeY,
-            largeFont,
-            minStr,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        drawDate(dc, now, timeY);
+        var timeWidth = drawTime(dc, now);
+        drawDate(dc, now);
         drawBattery(dc, timeWidth);
     }
 
@@ -133,7 +98,50 @@ class TimeDrawable extends WatchUi.Drawable {
         dc.drawText(clipStartX, clipStartY, smallFont, secStr, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
-    function drawDate(dc, now, timeY) {
+    function drawTime(dc, now) {
+        var largeFontHeight = dc.getFontHeight(largeFont);
+
+        var hrStr = now.hour.format("%02d");
+        var minStr = now.min.format("%02d");
+
+        var screenWidth = dc.getWidth();
+        var halfScreenWidth = screenWidth / 2;
+
+        var hrWidth = dc.getTextWidthInPixels(hrStr, largeFont);
+        var mnWidth = dc.getTextWidthInPixels(minStr, largeFont);
+        var timeWidth = hrWidth + mnWidth;
+        hhmmWidth = timeWidth;
+
+        var timeX = halfScreenWidth - (timeWidth / 2);
+        var timeY = halfScreenWidth - (largeFontHeight / 2);
+
+        // Draw hour
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        dc.drawText(
+            timeX,
+            timeY,
+            largeFont,
+            hrStr,
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        // Draw minute
+        dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK);
+        dc.drawText(
+            timeX + hrWidth,
+            timeY,
+            largeFont,
+            minStr,
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        return timeWidth;
+    }
+
+    function drawDate(dc, now) {
+        var screenWidth = dc.getWidth();
+        var halfScreenWidth = screenWidth / 2;
+
         var dayOfWeekStr = WatchUi.loadResource(m_weekResourceArray[now.day_of_week - 1]).toUpper();
         var monthStr = WatchUi.loadResource(m_monthResourceArray[now.month - 1]).toUpper();
         var dayStr = now.day.toString();
@@ -143,7 +151,7 @@ class TimeDrawable extends WatchUi.Drawable {
         // TODO: I don't understand why I need `-15` here, but
         // `largeFontHeight` seems to be larger than the text height
         var largeFontHeight = dc.getFontHeight(largeFont);
-        var dateY = timeY + largeFontHeight - 15;
+        var dateY = halfScreenWidth + (largeFontHeight / 2) - 15;
         var dayWidth = dc.getTextWidthInPixels(dayStr, smallFont);
         var monthWidth = dc.getTextWidthInPixels(monthStr, smallFont);
         var dayOfWeekWidth = dc.getTextWidthInPixels(dayOfWeekStr, smallFont);
@@ -157,7 +165,6 @@ class TimeDrawable extends WatchUi.Drawable {
         }
 
         // graphStart
-        var screenWidth = dc.getWidth();
         var dateX = (screenWidth - GRAPH_WIDTH) / 2;
 
         // Draw day
