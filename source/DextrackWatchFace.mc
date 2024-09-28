@@ -9,16 +9,14 @@ using Toybox.WatchUi;
 const FIVE_MINUTES = new Time.Duration(5 * 60);
 
 class DextrackWatchFace extends WatchUi.WatchFace {
-    private var timeDrawable;
-    private var bgDataDrawable;
+    private var dextrackDrawable;
     private var inLowPowerMode = false;
 
     function initialize() {
         Sys.println("-- DextrackWatchFace.initialize");
         WatchFace.initialize();
 
-        timeDrawable = View.findDrawableById("Time");
-        bgDataDrawable = View.findDrawableById("BgData");
+        dextrackDrawable = View.findDrawableById("Dextrack");
 
         startTemporalEvent();
     }
@@ -49,12 +47,8 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         // At least in the sim, `initialize`, `onUpdate`, and `draw` methods
         // seem to be racing or running concurrently, so we don't assume that
         // `initialize` has been run to completion here.
-        if (timeDrawable != null) {
-            timeDrawable.onPartialUpdate(dc);
-        }
-
-        if (bgDataDrawable != null) {
-            bgDataDrawable.onPartialUpdate(dc);
+        if (dextrackDrawable != null) {
+            dextrackDrawable.onPartialUpdate(dc);
         }
 
         startTemporalEvent();
@@ -64,11 +58,8 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         // Sys.println("-- DextractWatchFace.onPartialUpdate");
         if (inLowPowerMode) {
             // See comments in `onUpdate` on these null checks.
-            if (timeDrawable != null) {
-                timeDrawable.onPartialUpdate(dc);
-            }
-            if (bgDataDrawable != null) {
-                bgDataDrawable.onPartialUpdate(dc);
+            if (dextrackDrawable != null) {
+                dextrackDrawable.onPartialUpdate(dc);
             }
         }
 
