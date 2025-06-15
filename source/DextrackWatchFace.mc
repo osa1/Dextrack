@@ -102,6 +102,13 @@ class DextrackWatchFace extends WatchUi.WatchFace {
                         Lang.format(
                             "---- DextrackWatchFace.maybeStartTemporalEvent: using existing event at $1$:$2$:$3$",
                             [nextTemporalEventUtc.hour, nextTemporalEventUtc.min, nextTemporalEventUtc.sec]));
+
+                var now = Time.now();
+                var nowUtc = Gregorian.utcInfo(now, Time.FORMAT_SHORT);
+                Sys.println(
+                        Lang.format(
+                            "---- DextrackWatchFace.maybeStartTemporalEvent: current time $1$:$2$:$3$",
+                            [nowUtc.hour, nowUtc.min, nowUtc.sec]));
                 return;
             }
         }
