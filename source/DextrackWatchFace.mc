@@ -3,8 +3,10 @@ using Toybox.Graphics;
 using Toybox.Lang;
 using Toybox.System as Sys;
 using Toybox.System;
+using Toybox.Time.Gregorian;
 using Toybox.Time;
 using Toybox.WatchUi;
+using Toybox.Test;
 
 const FIVE_MINUTES = new Time.Duration(5 * 60);
 
@@ -18,7 +20,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
 
         dextrackDrawable = View.findDrawableById("Dextrack");
 
-        startTemporalEvent();
+        maybeStartTemporalEvent();
     }
 
     // Load resources here.
@@ -34,7 +36,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
     function onShow() as Void {
         // Sys.println("-- DextrackWatchFace.onShow");
 
-        startTemporalEvent();
+        maybeStartTemporalEvent();
     }
 
     // Update the view
@@ -51,7 +53,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
             dextrackDrawable.onPartialUpdate(dc);
         }
 
-        startTemporalEvent();
+        maybeStartTemporalEvent();
     }
 
     function onPartialUpdate(dc as Graphics.Dc) as Void {
@@ -63,7 +65,7 @@ class DextrackWatchFace extends WatchUi.WatchFace {
             }
         }
 
-        startTemporalEvent();
+        maybeStartTemporalEvent();
     }
 
     // Called when this View is removed from the screen. Save the state of this
@@ -85,20 +87,58 @@ class DextrackWatchFace extends WatchUi.WatchFace {
         inLowPowerMode = false;
     }
 
-    function startTemporalEvent() {
+    function maybeStartTemporalEvent() {
+        Sys.println("-- DextrackWatchFace.maybeStartTemporalEvent");
+
+        // nextTemporalEventTime: Moment or Duration.
         var nextTemporalEventTime = Background.getTemporalEventRegisteredTime();
-        if (nextTemporalEventTime != null) {
+
+        // We always register with a Moment, but I've seen other types here. So
+        // test the type.
+        if (nextTemporalEventTime instanceof Time.Moment) {
+            var nextTemporalEventUtc = Gregorian.utcInfo(nextTemporalEventTime, Time.FORMAT_SHORT);
+            if (nextTemporalEventTime != null) {
+                Sys.println(
+                        Lang.format(
+                            "---- DextrackWatchFace.maybeStartTemporalEvent: using existing event at $1$:$2$:$3$",
+                            [nextTemporalEventUtc.hour, nextTemporalEventUtc.min, nextTemporalEventUtc.sec]));
+                return;
+            }
+        }
+
+        startTemporalEvent();
+    }
+
+    function startTemporalEvent() {
+        Sys.println("-- DextrackWatchFace.startTemporalEvent");
+
+        // lastTemporalEventTime: Moment or null
+        var lastTemporalEventTime = Background.getLastTemporalEventTime();
+
+        // now: Moment
+        var now = Time.now();
+
+        if (lastTemporalEventTime == null) {
+            Sys.println(
+                    "-- DextrackWatchFace.startTemporalEvent: last temporal event is null, registering new now");
+            Background.registerForTemporalEvent(now);
             return;
         }
 
-        var lastTemporalEventTime = Background.getLastTemporalEventTime();
-        if (lastTemporalEventTime != null) {
-            // OK if this is in the past, event will be triggered immediately.
-            var nextTime = lastTemporalEventTime.add(FIVE_MINUTES);
-            Background.registerForTemporalEvent(nextTime);
-        } else {
-            var now = Time.now();
-            Background.registerForTemporalEvent(now);
-        }
+        var lastTemporalEventUtc = Gregorian.utcInfo(lastTemporalEventTime, Time.FORMAT_SHORT);
+        Sys.println(
+                Lang.format(
+                    "-- DextrackWatchFace.startTemporalEvent: last temporal event at $1$:$2$:$3$",
+                    [lastTemporalEventUtc.hour, lastTemporalEventUtc.min, lastTemporalEventUtc.sec]));
+
+        // nextMoment: Moment
+        var nextMoment = lastTemporalEventTime.add(FIVE_MINUTES);
+        var nextMomentUtc = Gregorian.utcInfo(now, Time.FORMAT_SHORT);
+        Sys.println(
+                Lang.format(
+                    "-- DextrackWatchFace.startTemporalEvent: registering temporal event at $1$:$2$:$3$",
+                    [nextMomentUtc.hour, nextMomentUtc.min, nextMomentUtc.sec]));
+
+        Background.registerForTemporalEvent(nextMoment);
     }
 }
