@@ -7,6 +7,7 @@ using Toybox.WatchUi;
 const GRAPH_HEIGHT = 40;
 
 // Store one hour of readings, one reading every 5 minutes.
+(:background)
 const NUM_BGS = 12;
 
 // X axis will have 125 minutes: last 120 minutes of readings, and 5 more

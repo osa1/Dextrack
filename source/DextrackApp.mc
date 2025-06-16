@@ -79,7 +79,7 @@ class DextrackApp extends Application.AppBase {
         }
 
         else if (dataMap[PROP_SESSION_ID] != null) {
-            setProperty(PROP_ERROR_MSG, MSG_REQUESTING_BG);
+            setProperty(PROP_ERROR_MSG, "REQUESTING BG DATA");
             setProperty(PROP_SESSION_ID, dataMap[PROP_SESSION_ID]);
             setProperty(PROP_WORK, WORK_READ_BGS);
         }

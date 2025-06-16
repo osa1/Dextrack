@@ -8,6 +8,7 @@ using Toybox.Time;
 using Toybox.WatchUi;
 using Toybox.Test;
 
+(:background)
 const FIVE_MINUTES = new Time.Duration(5 * 60);
 
 class DextrackWatchFace extends WatchUi.WatchFace {

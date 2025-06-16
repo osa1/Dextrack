@@ -91,7 +91,10 @@ This tool will print a line with 36 characters. This is your Dexcom account id.
 Copy this, and create the file `source/Secrets.mc` with contents:
 
 ```
+(:background)
 const DEX_ACCOUNT_ID = "<your Dexcom account id>";
+
+(:background)
 const DEX_PASSWORD = "<your Dexcom password>";
 ```
 

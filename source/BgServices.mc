@@ -4,6 +4,27 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
+// UNUSED: This endpoint is used to get an account id. Since account id never
+// changes, we don't need to get it again and again every time we lose the
+// session. So currently account id is obtained externally and then hard-coded
+// into the app.
+//
+// TODO: We should provide a way to get account id, and a setting in the watch
+// face to set it.
+// const DEXCOM_AUTHENTICATE_ENDPOINT = "http://shareous1.dexcom.com/ShareWebServices/Services/General/AuthenticatePublisherAccount";
+
+// https://github.com/StephenBlackWasAlreadyTaken/xDrip/issues/182#issuecomment-1164859237
+(:background)
+const DEXCOM_APPLICATION_ID = "d89443d2-327c-4a6f-89e5-496bbb0317db";
+
+// Endpoint used to get session id, which is then used to read BG data.
+(:background)
+const DEXCOM_LOGIN_ENDPOINT = "https://shareous1.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountById";
+
+// Endpoint used to read BG data.
+(:background)
+const DEXCOM_BG_DATA_ENDPOINT = "https://shareous1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues";
+
 // https://forums.garmin.com/developer/connect-iq/f/discussion/324155/onbackgrounddata-not-called
 // suggets :background with :background_app somehow works better. No official documentation on the
 // issue..
@@ -138,7 +159,7 @@ class BgDataService extends System.ServiceDelegate {
         if (responseCode == 500) {
             // Session invalid. Login again.
             Background.exit({
-                PROP_ERROR_MSG => MSG_INVALID_SESSION
+                PROP_ERROR_MSG => "SESSION INVALID"
             });
             return;
         }
