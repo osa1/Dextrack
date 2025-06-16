@@ -23,28 +23,3 @@ const DEXCOM_APPLICATION_ID = "d89443d2-327c-4a6f-89e5-496bbb0317db";
 const MSG_REQUESTING_BG = "REQUESTING BG DATA";
 const MSG_LOGGING_IN = "LOGGING IN";
 const MSG_INVALID_SESSION = "SESSION INVALID";
-
-function msgLoginError(responseCode) {
-    // Handle some common errors.
-    if (responseCode == -2) {
-        return "BLE host timeout";
-    } else if (responseCode == -104) {
-        return "BLE unavailable";
-    } else {
-        return Lang.format("LOGIN ERROR $1$", [responseCode]);
-    }
-}
-
-function msgOtherError(responseCode) {
-    // Handle some common errors. Reference:
-    // https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html
-    if (responseCode == -2) {
-        return "BLE host timeout";
-    } else if (responseCode == -104) {
-        return "BLE unavailable";
-    } else if (responseCode == -300) {
-        return "Req timeout";
-    } else {
-        return Lang.format("ERROR $1$", [responseCode]);
-    }
-}
