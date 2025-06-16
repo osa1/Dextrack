@@ -24,7 +24,7 @@ account_id_response = requests.request(
 
 account_id = account_id_response.json()
 
-print(account_id)
+print("Account id = %s" % account_id)
 
 session_id_response = requests.request(
     "POST",
@@ -38,7 +38,7 @@ session_id_response = requests.request(
 
 session_id = session_id_response.json()
 
-print(session_id)
+print("Session id = %s" % session_id)
 
 bg_data = requests.request(
     "POST",
