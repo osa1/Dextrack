@@ -58,16 +58,17 @@ class BgDataService extends System.ServiceDelegate {
                     :headers => {
                         "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                     },
-                    // This endpoint returns Content-Type "application/json",
-                    // but the body is just a string (in double quotes), which
-                    // according to 4627 is not valid JSON (it must be an
-                    // object or array), and Garmin SDK doesn't accept it.
-                    //
-                    // However it accepts the response with
-                    // HTTP_RESPONSE_CONTENT_TYPE_TEXT_PLAIN even though the
-                    // documentation says "content-type must be text/plain", so
-                    // we use that.
-                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_TEXT_PLAIN
+                    // Note: this used to be
+                    // `HTTP_RESPONSE_CONTENT_TYPE_TEXT_PLAIN` because even
+                    // though the content type is `application/json`, the
+                    // content was just a string (in double quotes), which
+                    // Garmin SDK did not accept as a valid JSON. The SDK
+                    // started accepting it at some point, but I'm not sure if
+                    // that was intentional, as a string at the top level is
+                    // not a JSON document, the top-level JSON should be an
+                    // object. Leaving this note here in case it gets
+                    // broken/fixed again later.
+                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
                 },
                 method(:loginResponseCallback)
             );
